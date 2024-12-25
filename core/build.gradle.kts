@@ -35,6 +35,12 @@ android {
     }
 }
 
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
 dependencies {
     implementation(libs.hilt)
     ksp (libs.hilt.compiler)

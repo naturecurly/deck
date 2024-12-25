@@ -8,9 +8,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
-import dagger.multibindings.IntoSet
-import dagger.multibindings.StringKey
 import kotlin.reflect.KClass
 
 @Module
@@ -18,7 +17,7 @@ import kotlin.reflect.KClass
 class MainFeatureDeckModule {
     @IntoMap
     @Provides
-    @StringKey("MainFeature")
+    @ClassKey(MainViewModel::class)
     fun provideMainFeatureDeckDependencies(): Class<out DeckDependencies> =
         MainFeatureDeckDependencies::class.java
 

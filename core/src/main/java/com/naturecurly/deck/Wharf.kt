@@ -1,47 +1,64 @@
 package com.naturecurly.deck
 
+import android.app.Application
 import android.content.Context
+import com.naturecurly.deck.model.DeckEntry
 import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
 object Wharf {
-    private val containers: MutableMap<String, DeckContainer<*, *>> = mutableMapOf()
-    private val providerToConsumerSetMap: MutableMap<KClass<out DeckProvider<*>>, Set<DeckConsumer<*, *>>> =
-        mutableMapOf()
-    private val containerToConsumerSetMap: MutableMap<KClass<out DeckContainer<*, *>>, DeckConsumer<*, *>> =
-        mutableMapOf()
+    private var application: Application? = null
+
+    // synchronizedMap is used to make the map thread-safe?
+    private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
+    private val deckEntry = DeckEntry()
 
     fun init(context: Context) {
-        val entryPoints = EntryPoints.get(context, DeckDependenciesEntryPoint::class.java)
-        containers.clear()
-        providerToConsumerSetMap.clear()
-        containerToConsumerSetMap.clear()
-        entryPoints.dependencies().forEach {
-            (EntryPoints.get(context, it.value)).let { dependencies ->
-                val consumers = dependencies.consumers()
-                providerToConsumerSetMap[dependencies.providerClass()] = consumers
-                dependencies.containerToConsumerPairs().forEach { containerConsumerPair ->
-                    val container = containerConsumerPair.first
-                    containers[container.id] = container
-                    containerToConsumerSetMap[container::class] = consumers.first { consumer ->
-                        consumer::class == containerConsumerPair.second
-                    }
-                }
-            }
+        entryPoints.clear()
+        deckEntry.clear()
+        entryPoints.putAll(
+            EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies()
+        )
+        if (context is Application) {
+            application = context
+        } else {
+            // Warning: context is not an instance of Application
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <INPUT> getDeckConsumers(providerClass: KClass<out DeckProvider<*>>): Set<DeckConsumer<INPUT, *>> {
-        return providerToConsumerSetMap[providerClass] as Set<DeckConsumer<INPUT, *>>
+        return entryPoints[providerClass.java]?.let { dep ->
+            application?.let { app ->
+                val dependencies = EntryPoints.get(app, dep)
+                val consumers = dependencies.consumers() as Set<DeckConsumer<INPUT, *>>
+                deckEntry.addProvider(providerClass)
+                consumers.forEach {
+                    deckEntry.addConsumer(
+                        providerClass = providerClass,
+                        consumerClass = it::class,
+                        consumer = it
+                    )
+                }
+                dependencies.containerToConsumerPairs().forEach { containerConsumerPair ->
+                    val container = containerConsumerPair.first
+                    deckEntry.addContainer(
+                        containerClass = container::class,
+                        consumerClass = containerConsumerPair.second,
+                        container = container
+                    )
+                }
+                deckEntry.getDeckConsumers(providerClass) as Set<DeckConsumer<INPUT, *>>
+            }
+        } ?: emptySet()
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <CONSUMER : DeckConsumer<*, *>> getDeckConsumer(containerClass: KClass<out DeckContainer<*, *>>): CONSUMER {
-        return containerToConsumerSetMap[containerClass] as CONSUMER
+        return deckEntry.getDeckConsumer(containerClass) as CONSUMER
     }
 
     fun getDeckContainers(): Map<String, DeckContainer<*, *>> {
-        return containers
+        return deckEntry.getContainers().associate { it.id to it }
     }
 }

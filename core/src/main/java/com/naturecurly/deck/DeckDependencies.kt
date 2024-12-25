@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface DeckDependenciesEntryPoint {
-    fun dependencies(): Map<String, @JvmSuppressWildcards Class<out DeckDependencies>>
+    fun dependencies(): Map<Class<*>, @JvmSuppressWildcards Class<out DeckDependencies>>
 }
 
 interface DeckDependencies {
