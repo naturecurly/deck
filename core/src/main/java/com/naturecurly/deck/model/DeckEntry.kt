@@ -59,7 +59,8 @@ class DeckEntry {
         return containers[containerClass]?.consumer?.consumer
     }
 
-    fun getContainers(): Set<DeckContainer<*, *>> {
-        return containers.map { it.value.container }.toSet()
+    fun getContainersByProvider(providerClass: KClass<out DeckProvider<*>>): Set<DeckContainer<*, *>> {
+        return providers[providerClass]?.consumers?.flatMap { it.containers }?.map { it.container }
+            ?.toSet() ?: emptySet()
     }
 }

@@ -8,8 +8,7 @@ internal data class ConsumerEntry(
     val clazz: KClass<out DeckConsumer<*, *>>,
     val consumer: DeckConsumer<*, *>
 ) {
-    val containers: Set<ContainerEntry>
-        field = mutableSetOf<ContainerEntry>()
+    val containers: MutableSet<ContainerEntry> = mutableSetOf<ContainerEntry>()
 
     fun addContainer(container: ContainerEntry) = containers.add(container)
     fun clear(): List<KClass<out DeckContainer<*, *>>> {

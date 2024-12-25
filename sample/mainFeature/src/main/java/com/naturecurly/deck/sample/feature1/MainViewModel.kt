@@ -14,4 +14,9 @@ class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
         initDeckProvider(viewModelScope)
         onDeckReady(viewModelScope, "Hello, World!")
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        onDeckClear()
+    }
 }

@@ -5,8 +5,7 @@ import com.naturecurly.deck.DeckProvider
 import kotlin.reflect.KClass
 
 internal data class ProviderEntry(val clazz: KClass<out DeckProvider<*>>) {
-    val consumers: Set<ConsumerEntry>
-        field = mutableSetOf<ConsumerEntry>()
+    val consumers: MutableSet<ConsumerEntry> = mutableSetOf<ConsumerEntry>()
 
     fun addConsumer(consumer: ConsumerEntry) = consumers.add(consumer)
     fun clear(): List<KClass<out DeckConsumer<*, *>>> {

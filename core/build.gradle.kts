@@ -35,15 +35,10 @@ android {
     }
 }
 
-kotlin {
-    sourceSets.all {
-        languageSettings.enableLanguageFeature("ExplicitBackingFields")
-    }
-}
-
 dependencies {
     implementation(libs.hilt)
-    ksp (libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

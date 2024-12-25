@@ -58,7 +58,11 @@ object Wharf {
         return deckEntry.getDeckConsumer(containerClass) as CONSUMER
     }
 
-    fun getDeckContainers(): Map<String, DeckContainer<*, *>> {
-        return deckEntry.getContainers().associate { it.id to it }
+    fun getDeckContainers(providerClass: KClass<out DeckProvider<*>>): Map<String, DeckContainer<*, *>> {
+        return deckEntry.getContainersByProvider(providerClass).associate { it.id to it }
+    }
+
+    fun clearProvider(providerClass: KClass<out DeckProvider<*>>) {
+        deckEntry.clearProvider(providerClass)
     }
 }

@@ -16,7 +16,7 @@ import com.naturecurly.deck.sample.designsystem.theme.DeckTheme
 fun MainScreen(viewModel: MainViewModel = viewModel()) {
     DeckTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Deck {
+            Deck(viewModel) {
                 Column {
                     Greeting(
                         name = "Android",
