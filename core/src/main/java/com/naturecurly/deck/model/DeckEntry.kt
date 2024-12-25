@@ -2,32 +2,31 @@ package com.naturecurly.deck.model
 
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckProvider
 import kotlin.reflect.KClass
 
-class DeckEntry {
-    private val providers = mutableMapOf<KClass<out DeckProvider<*>>, ProviderEntry>()
+internal class DeckEntry {
+    private val providers = mutableMapOf<Int, ProviderEntry>()
     private val consumers = mutableMapOf<KClass<out DeckConsumer<*, *>>, ConsumerEntry>()
     private val containers = mutableMapOf<KClass<out DeckContainer<*, *>>, ContainerEntry>()
 
-    fun addProvider(providerClass: KClass<out DeckProvider<*>>) {
-        providers[providerClass] = ProviderEntry(providerClass)
+    fun addProvider(providerIdentity: Int) {
+        providers[providerIdentity] = ProviderEntry(providerIdentity)
     }
 
     fun addConsumer(
-        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
         consumerClass: KClass<out DeckConsumer<*, *>>,
-        consumer: DeckConsumer<*, *>
+        consumer: DeckConsumer<*, *>,
     ) {
         val consumerEntry = ConsumerEntry(consumerClass, consumer)
-        providers[providerClass]?.addConsumer(consumerEntry)
+        providers[providerIdentity]?.addConsumer(consumerEntry)
         consumers[consumerClass] = consumerEntry
     }
 
     fun addContainer(
         containerClass: KClass<out DeckContainer<*, *>>,
         consumerClass: KClass<out DeckConsumer<*, *>>,
-        container: DeckContainer<*, *>
+        container: DeckContainer<*, *>,
     ) {
         consumers[consumerClass]?.let { consumer ->
             val containerEntry = ContainerEntry(containerClass, container, consumer)
@@ -35,8 +34,8 @@ class DeckEntry {
         }
     }
 
-    fun clearProvider(providerClass: KClass<out DeckProvider<*>>) {
-        val consumersToBeCleared = providers.remove(providerClass)?.clear()
+    fun clearProvider(providerIdentity: Int) {
+        val consumersToBeCleared = providers.remove(providerIdentity)?.clear()
         consumersToBeCleared?.forEach { consumer ->
             val containersToBeCleared = consumers.remove(consumer)?.clear()
             containersToBeCleared?.forEach { container ->
@@ -51,16 +50,21 @@ class DeckEntry {
         containers.clear()
     }
 
-    fun getDeckConsumers(providerClass: KClass<out DeckProvider<*>>): Set<DeckConsumer<*, *>> {
-        return providers[providerClass]?.consumers?.map { it.consumer }?.toSet() ?: emptySet()
+    fun containsProvider(providerIdentity: Int): Boolean {
+        return providers.contains(providerIdentity)
+    }
+
+    fun getDeckConsumers(providerIdentity: Int): Set<DeckConsumer<*, *>> {
+        return providers[providerIdentity]?.consumers?.map { it.consumer }?.toSet() ?: emptySet()
     }
 
     fun getDeckConsumer(containerClass: KClass<out DeckContainer<*, *>>): DeckConsumer<*, *>? {
         return containers[containerClass]?.consumer?.consumer
     }
 
-    fun getContainersByProvider(providerClass: KClass<out DeckProvider<*>>): Set<DeckContainer<*, *>> {
-        return providers[providerClass]?.consumers?.flatMap { it.containers }?.map { it.container }
+    fun getContainersByProvider(providerIdentity: Int): Set<DeckContainer<*, *>> {
+        return providers[providerIdentity]?.consumers?.flatMap { it.containers }
+            ?.map { it.container }
             ?.toSet() ?: emptySet()
     }
 }

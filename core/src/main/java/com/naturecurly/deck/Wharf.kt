@@ -13,7 +13,7 @@ object Wharf {
     private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
     private val deckEntry = DeckEntry()
 
-    fun init(context: Context) {
+    internal fun init(context: Context) {
         entryPoints.clear()
         deckEntry.clear()
         entryPoints.putAll(
@@ -26,16 +26,37 @@ object Wharf {
         }
     }
 
+    internal fun <INPUT> getDeckConsumers(
+        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
+    ): Set<DeckConsumer<INPUT, *>> {
+        if (!deckEntry.containsProvider(providerIdentity)) {
+            registerNewProvider<INPUT>(providerClass, providerIdentity)
+        }
+        return deckEntry.getDeckConsumers(providerIdentity) as Set<DeckConsumer<INPUT, *>>
+    }
+
+    internal fun getDeckContainers(providerIdentity: Int): Map<String, DeckContainer<*, *>> {
+        return deckEntry.getContainersByProvider(providerIdentity).associate { it.id to it }
+    }
+
+    internal fun clearProvider(providerIdentity: Int) {
+        deckEntry.clearProvider(providerIdentity)
+    }
+
     @Suppress("UNCHECKED_CAST")
-    fun <INPUT> getDeckConsumers(providerClass: KClass<out DeckProvider<*>>): Set<DeckConsumer<INPUT, *>> {
-        return entryPoints[providerClass.java]?.let { dep ->
+    private fun <INPUT> registerNewProvider(
+        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
+    ) {
+        entryPoints[providerClass.java]?.let { dep ->
             application?.let { app ->
                 val dependencies = EntryPoints.get(app, dep)
                 val consumers = dependencies.consumers() as Set<DeckConsumer<INPUT, *>>
-                deckEntry.addProvider(providerClass)
+                deckEntry.addProvider(providerIdentity)
                 consumers.forEach {
                     deckEntry.addConsumer(
-                        providerClass = providerClass,
+                        providerIdentity = providerIdentity,
                         consumerClass = it::class,
                         consumer = it
                     )
@@ -47,22 +68,11 @@ object Wharf {
                         consumerClass = containerConsumerPair.second,
                         container = container
                     )
+                    deckEntry.getDeckConsumer(container::class)?.let { consumer ->
+                        container.setConsumer(consumer)
+                    }
                 }
-                deckEntry.getDeckConsumers(providerClass) as Set<DeckConsumer<INPUT, *>>
             }
-        } ?: emptySet()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <CONSUMER : DeckConsumer<*, *>> getDeckConsumer(containerClass: KClass<out DeckContainer<*, *>>): CONSUMER {
-        return deckEntry.getDeckConsumer(containerClass) as CONSUMER
-    }
-
-    fun getDeckContainers(providerClass: KClass<out DeckProvider<*>>): Map<String, DeckContainer<*, *>> {
-        return deckEntry.getContainersByProvider(providerClass).associate { it.id to it }
-    }
-
-    fun clearProvider(providerClass: KClass<out DeckProvider<*>>) {
-        deckEntry.clearProvider(providerClass)
+        }
     }
 }
