@@ -4,9 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 
 interface DeckProvider<OUTPUT> {
     private val consumers: Set<DeckConsumer<OUTPUT, *>>
-        get() = Wharf.getDeckConsumers(this::class, System.identityHashCode(this))
+        get() = WharfLocal.get().getDeckConsumers(this::class, System.identityHashCode(this))
     val containers: Map<String, DeckContainer<*, *>>
-        get() = Wharf.getDeckContainers(System.identityHashCode(this))
+        get() = WharfLocal.get().getDeckContainers(System.identityHashCode(this))
 
     fun initDeckProvider(scope: CoroutineScope) {
         consumers.forEach { it.init(scope) }
@@ -17,6 +17,6 @@ interface DeckProvider<OUTPUT> {
     }
 
     fun onDeckClear() {
-        Wharf.clearProvider(System.identityHashCode(this))
+        WharfLocal.get().clearProvider(System.identityHashCode(this))
     }
 }

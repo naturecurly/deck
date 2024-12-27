@@ -4,21 +4,17 @@ import android.app.Application
 import android.content.Context
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckProvider
-import com.naturecurly.deck.ProviderRegister
 import com.naturecurly.deck.Wharf
-import com.naturecurly.deck.Wharf.Companion.deckEntry
-import com.naturecurly.deck.Wharf.Companion.providerRegister
 import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
-object WharfProxy : Wharf, ProviderRegister {
+class WharfImpl() : Wharf() {
     private var application: Application? = null
 
     // synchronizedMap is used to make the map thread-safe?
     private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
 
     internal fun init(context: Context) {
-        providerRegister = this
         entryPoints.clear()
         deckEntry.clear()
         entryPoints.putAll(
