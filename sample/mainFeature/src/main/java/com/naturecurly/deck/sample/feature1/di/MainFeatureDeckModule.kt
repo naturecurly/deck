@@ -1,8 +1,8 @@
 package com.naturecurly.deck.sample.feature1.di
 
-import com.naturecurly.deck.DeckDependencies
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.annotations.DeckQualifier
+import com.naturecurly.deck.compose.DeckDependencies
 import com.naturecurly.deck.sample.feature1.MainViewModel
 import dagger.Module
 import dagger.Provides

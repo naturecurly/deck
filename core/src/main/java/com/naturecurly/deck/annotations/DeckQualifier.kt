@@ -1,6 +1,6 @@
 package com.naturecurly.deck.annotations
 
-import javax.inject.Qualifier
+import jakarta.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

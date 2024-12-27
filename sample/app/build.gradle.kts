@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
+    implementation(projects.compose)
     implementation(projects.sample.designsystem)
     implementation(projects.sample.mainFeature)
     implementation(projects.sample.subFeatureOne)

@@ -4,7 +4,7 @@ import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
 import kotlin.reflect.KClass
 
-internal class DeckEntry {
+class DeckEntry {
     private val providers = mutableMapOf<Int, ProviderEntry>()
     private val consumers = mutableMapOf<KClass<out DeckConsumer<*, *>>, ConsumerEntry>()
     private val containers = mutableMapOf<KClass<out DeckContainer<*, *>>, ContainerEntry>()

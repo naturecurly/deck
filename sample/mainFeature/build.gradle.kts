@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
+    implementation(projects.compose)
     implementation(projects.sample.designsystem)
     implementation(libs.hilt)
     ksp (libs.hilt.compiler)

@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.naturecurly.deck.Deck
+import com.naturecurly.deck.compose.Deck
 import com.naturecurly.deck.sample.designsystem.theme.DeckTheme
 
 @Composable

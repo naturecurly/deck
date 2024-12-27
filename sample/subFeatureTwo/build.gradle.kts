@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
+    implementation(projects.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.material3)
