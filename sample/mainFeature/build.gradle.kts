@@ -37,9 +37,10 @@ android {
 
 dependencies {
     implementation(projects.compose)
+    ksp(projects.codegen)
     implementation(projects.sample.designsystem)
     implementation(libs.hilt)
-    ksp (libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.lifecycle.viewmodel.compose)

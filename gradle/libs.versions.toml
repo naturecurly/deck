@@ -44,6 +44,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "jakartaInject" }
 
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
