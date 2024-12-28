@@ -9,12 +9,15 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.naturecurly.deck.annotations.Provider
-import com.naturecurly.deck.codegen.generator.ProviderDepInjectionGenerator
+import com.naturecurly.deck.codegen.generator.ProviderDeckModuleGenerator
+import com.naturecurly.deck.codegen.generator.ProviderDepsGenerator
+import com.squareup.kotlinpoet.ksp.toClassName
 
 class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val codeGenerator = environment.codeGenerator
     private val logger = environment.logger
-    private val providerDepInjectionGenerator by lazy { ProviderDepInjectionGenerator(environment.codeGenerator) }
+    private val providerDepsGenerator by lazy { ProviderDepsGenerator(codeGenerator) }
+    private val providerDeckModuleGenerator by lazy { ProviderDeckModuleGenerator(codeGenerator) }
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -27,8 +30,19 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
 
             if (provider is KSClassDeclaration) {
                 val providerId = provider.getAnnotationsByType(Provider::class).firstOrNull()?.id
+                val destinationPackageName = provider.packageName.asString() + ".di"
                 providerId?.let {
-                    providerDepInjectionGenerator.generate(it, provider.packageName.asString())
+                    val providerDepsClass =
+                        providerDepsGenerator.generate(
+                            providerId = it,
+                            destinationPackageName = destinationPackageName
+                        )
+                    providerDeckModuleGenerator.generate(
+                        providerId = it,
+                        providerClassName = provider.toClassName(),
+                        providerDepsInterfaceClassName = providerDepsClass,
+                        destinationPackageName = destinationPackageName
+                    )
                 }
                 logger.warn("${provider.simpleName.asString()} is annotated by @Provider")
             }

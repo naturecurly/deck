@@ -3,8 +3,9 @@ package com.naturecurly.deck.codegen.generator
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckProvider
-import com.naturecurly.deck.annotations.DeckQualifier
+import com.naturecurly.deck.codegen.generator.util.deckDependenciesClassName
+import com.naturecurly.deck.codegen.generator.util.deckProviderKClassReturnType
+import com.naturecurly.deck.codegen.generator.util.getDeckQualifierAnnotation
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -22,24 +23,13 @@ import dagger.hilt.components.SingletonComponent
 import java.util.Locale
 import kotlin.reflect.KClass
 
-class ProviderDepInjectionGenerator(private val codeGenerator: CodeGenerator) {
-    private val deckDependenciesClassName =
-        ClassName("com.naturecurly.deck.compose", "DeckDependencies")
-
-    fun generate(providerId: String, packageName: String) {
+class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
+    fun generate(providerId: String, destinationPackageName: String): ClassName {
         val deckDependenciesInterfaceName =
             providerId.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() } + "DeckDependencies"
-        val deckQualifierAnnotation = AnnotationSpec.builder(DeckQualifier::class)
-            .addMember("%S", providerId)
-            .build()
+        val deckQualifierAnnotation = getDeckQualifierAnnotation(providerId)
 
         // region Return Type
-        val deckProviderKClassReturnType =
-            KClass::class.asClassName().parameterizedBy(
-                WildcardTypeName.producerOf(
-                    DeckProvider::class.asClassName().parameterizedBy(STAR)
-                )
-            )
         val consumerSetReturnType = Set::class.asClassName().parameterizedBy(
             DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR).copy(
                 annotations = listOf(AnnotationSpec.builder(JvmSuppressWildcards::class).build())
@@ -98,9 +88,12 @@ class ProviderDepInjectionGenerator(private val codeGenerator: CodeGenerator) {
                 .addFunction(functionContainerToConsumerPairs)
                 .build()
 
-        FileSpec.builder("$packageName.di", deckDependenciesInterfaceName)
+        val deckDependenciesInterfaceClassName =
+            ClassName(destinationPackageName, deckDependenciesInterfaceName)
+        FileSpec.builder(deckDependenciesInterfaceClassName)
             .addType(deckDependenciesInterfaceType)
             .build()
             .writeTo(codeGenerator, aggregating = false)
+        return deckDependenciesInterfaceClassName
     }
 }
