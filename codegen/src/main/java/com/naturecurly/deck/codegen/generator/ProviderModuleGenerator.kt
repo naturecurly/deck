@@ -21,7 +21,7 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import java.util.Locale
 
-class ProviderDeckModuleGenerator(private val codeGenerator: CodeGenerator) {
+class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
     fun generate(
         providerId: String,
         providerClassName: ClassName,
