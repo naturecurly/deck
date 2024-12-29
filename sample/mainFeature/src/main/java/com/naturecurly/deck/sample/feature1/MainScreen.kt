@@ -23,6 +23,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                         modifier = Modifier.padding(innerPadding)
                     )
                     Stub("FeatureOne")
+                    Stub("FeatureTwo")
                 }
             }
         }
