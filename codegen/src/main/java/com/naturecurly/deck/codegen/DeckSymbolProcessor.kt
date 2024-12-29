@@ -17,8 +17,10 @@ import com.naturecurly.deck.codegen.generator.ConsumerModuleGenerator
 import com.naturecurly.deck.codegen.generator.ContainerModuleGenerator
 import com.naturecurly.deck.codegen.generator.ProviderDepsGenerator
 import com.naturecurly.deck.codegen.generator.ProviderModuleGenerator
+import com.naturecurly.deck.codegen.generator.util.deckComposeContainerClassName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ksp.toClassName
+import javax.inject.Inject
 
 class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val codeGenerator = environment.codeGenerator
@@ -30,7 +32,14 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        // Provider code gen
+        processProviders(resolver)
+        val consumerProviderMap = processConsumers(resolver)
+        processContainers(resolver, consumerProviderMap)
+        return emptyList()
+    }
+
+    @OptIn(KspExperimental::class)
+    private fun processProviders(resolver: Resolver) {
         val providers = resolver.getSymbolsWithAnnotation(PROVIDER_CLASS_NAME)
         for (provider in providers) {
             if (provider !is KSDeclaration) {
@@ -56,8 +65,10 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 }
             }
         }
+    }
 
-        // Consumer code gen
+    @OptIn(KspExperimental::class)
+    private fun processConsumers(resolver: Resolver): Map<ClassName, String> {
         val consumers = resolver.getSymbolsWithAnnotation(CONSUMER_CLASS_NAME)
         val consumerProviderIdMap = hashMapOf<ClassName, String>()
         for (consumer in consumers) {
@@ -82,8 +93,13 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 }
             }
         }
+        return consumerProviderIdMap
+    }
 
-        // Container code gen
+    private fun processContainers(
+        resolver: Resolver,
+        consumerProviderIdMap: Map<ClassName, String>,
+    ) {
         val containers = resolver.getSymbolsWithAnnotation(CONTAINER_CLASS_NAME)
         for (container in containers) {
             if (container !is KSDeclaration) {
@@ -96,43 +112,49 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     continue
                 }
                 val destinationPackageName = container.packageName.asString() + ".di"
-                val consumerClass = getConsumerFromContainer(container) as? KSClassDeclaration
-                logger.warn("consumerClass: $consumerClass")
-                val providerId = consumerProviderIdMap[consumerClass?.toClassName()]
-                if (consumerClass != null && providerId != null) {
-                    containerModuleGenerator.generate(
-                        providerId = providerId,
-                        containerClassName = container.toClassName(),
-                        consumerClassName = consumerClass.toClassName(),
-                        destinationPackageName = destinationPackageName
-                    )
+                val consumerClassName = getConsumerFromContainer(container)
+                if (consumerClassName == null) {
+                    logger.error("$container does not implement a DeckContainer with a valid DeckConsumer")
+                    continue
                 }
+                val providerId = consumerProviderIdMap[consumerClassName]
+                if (providerId == null) {
+                    logger.error("Couldn't find a providerId for $consumerClassName. Are the $consumerClassName and $container inside the same module? ")
+                    continue
+                }
+                containerModuleGenerator.generate(
+                    providerId = providerId,
+                    containerClassName = container.toClassName(),
+                    consumerClassName = consumerClassName,
+                    destinationPackageName = destinationPackageName
+                )
             }
         }
-
-        return emptyList()
     }
 
     private fun hasInjectAnnotation(classDeclaration: KSClassDeclaration): Boolean {
-        val constructors = classDeclaration.getConstructors()
-
-        return constructors.any { constructor ->
+        return classDeclaration.getConstructors().any { constructor ->
             constructor.annotations.any { annotation ->
-                val annotationName = annotation.shortName.asString()
-                val annotationPackage =
-                    annotation.annotationType.resolve().declaration.packageName.asString()
+                when (annotation.shortName.asString()) {
+                    Inject::class.simpleName,
+                    jakarta.inject.Inject::class.simpleName,
+                        -> annotation.annotationType.resolve().declaration.qualifiedName?.asString()
+                        .let { it == Inject::class.qualifiedName || it == jakarta.inject.Inject::class.qualifiedName }
 
-                annotationName == "Inject" && (annotationPackage == "javax.inject" || annotationPackage == "jakarta.inject")
+                    else -> false
+                }
             }
         }
     }
 
-    fun getConsumerFromContainer(container: KSClassDeclaration): KSDeclaration? {
-        val parentType = container.superTypes
-            .map { it.resolve() }
-            .firstOrNull { it.declaration.simpleName.asString() == "DeckComposeContainer" }
-
-        return parentType?.arguments?.getOrNull(1)?.type?.resolve()?.declaration
+    fun getConsumerFromContainer(container: KSClassDeclaration): ClassName? {
+        for (superType in container.superTypes) {
+            val ksType = superType.resolve()
+            if (ksType.declaration.qualifiedName?.asString() == deckComposeContainerClassName.canonicalName) {
+                return (ksType.arguments.getOrNull(1)?.type?.resolve()?.declaration as? KSClassDeclaration)?.toClassName()
+            }
+        }
+        return null
     }
 
     private companion object {
