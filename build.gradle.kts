@@ -19,7 +19,7 @@ allprojects {
     plugins.withId("com.vanniktech.maven.publish.base") {
         configure<MavenPublishBaseExtension> {
             coordinates(group.toString(), "deck-$name", version.toString())
-            publishToMavenCentral(SonatypeHost.S01)
+            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
             signAllPublications()
 
             pom {
@@ -35,8 +35,8 @@ allprojects {
                 }
                 scm {
                     url.set("https://github.com/naturecurly/deck/")
-                    connection.set("scm:git:git://github.com/naturecurly/Deck.git")
-                    developerConnection.set("scm:git:ssh://git@github.com:naturecurly/Deck.git")
+                    connection.set("scm:git:git://github.com/naturecurly/deck.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:naturecurly/deck.git")
                 }
                 developers {
                     developer {
