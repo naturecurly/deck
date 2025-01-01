@@ -19,9 +19,100 @@ ksp("com.naturecurly.deck:deck-codegen:0.1.0")
 
 Usage
 --------
-#### Primary Feature
-#### Subfeature
+### Primary Feature
+1. Make the ViewModel or Presenter of the primary feature inherit from DeckProvider. Specify the generic type for the type that the subfeatures will consume. For example, the `MainViewModel` below exposes a `String` to subfeatures:
+```kotlin
+class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> { // Extends the DeckProvider
+    // ViewModel logic here
+}
+```
+2. Mark the class (e.g., ViewModel, Presenter) with the @Provider annotation. The annotation parameter should be the ID of the main feature, allowing subfeatures to bind to the primary feature. For example, when the id is `MainFeature`:
+```kotlin
+@Provider("MainFeature")
+class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
+    // ViewModel logic here
+}
+```
+3. Call DeckProvider's lifecycle functions at the appropriate time
+```kotlin
+@Provider("MainFeature")
+class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
+    init {
+        initDeckProvider(viewModelScope) // Call DeckProvider's init function
+        onDeckReady(viewModelScope, "Hello, World!") // Call when the output data is ready
+    }
 
+    override fun onCleared() {
+        super.onCleared()
+        onDeckClear() // Call when the primary feature is destroyed
+    }
+}
+```
+### Subfeatures
+1. Create a Consumer for the primary feature and extend the `DeckConsumer`. The `String` is the input type from the DeckProvider(MainViewModel), and the `FeatureOneModel` is the output that will be consumed by UI:
+```kotlin
+// Note: Please add @Inject constructor to your consumer to enable Hilt to inject automatically
+class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() { ... }
+```
+2. Mark the class with the @Consumer annotation, and the annotation parameter should be the primary feature's id which was defined above:
+```kotlin
+@Consumer(bindTo = "MainFeature")
+class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() { ... }
+```
+3. Implement the functions in the DeckConsumer. The `uiStateFlow` can be listened to in your UI code later and the `onEvent()` is to handle events from UI:
+```kotlin
+@Consumer(bindTo = "MainFeature")
+class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() {
+    override fun init(scope: CoroutineScope) {
+        ...
+    }
+
+    override fun onDataReady(scope: CoroutineScope, data: String) {
+        _uiStateFlow.value = FeatureTwoModel(title = "Feature One", subtitle = data)
+    }
+
+    private val _uiStateFlow = MutableStateFlow<FeatureTwoModel>(FeatureOneModel())
+
+    override val uiStateFlow: StateFlow<FeatureOneModel> = _uiStateFlow
+
+    override fun onEvent(event: Any) {
+        ...
+    }
+}
+```
+4. Create a Container for UI which will be injected into the primary feature. The container is marked with @Container, and it extends the `DeckComposeContainer`. The `FeatureOneModel` is the input type, and the `FeatureOneConsumer` is the UI data source.
+```kotlin
+@Container
+class FeatureOneContainer @Inject constructor() :DeckComposeContainer<FeatureOneModel, FeatureOneConsumer>() {
+    // UI content
+    @Composable
+    override fun Content() {
+        val state by consumer.uiStateFlow.collectAsStateWithLifecycle()
+        Column {
+            Text(state.title)
+            Text(state.subtitle)
+        }
+    }
+    // ID of the UI, and it will used to locate the container in the primary feature's UI 
+    override val id: String = "FeatureOne"
+}
+```
+### Inject Subfeatures' UI to the Primary Feature UI
+Call `Deck(provider: DeckProvider) {}` in your primary feature's composable code, and in the block, you can add any composable code. In the DeckScope, `Stub(containerId: String)` is used to inject the target subfeature's container(UI)
+```kotlin
+@Composable
+fun MainScreen(viewModel: MainViewModel = viewModel()) {
+    Scaffold(modifier = Modifier.fillMaxSize()) {
+          Deck(viewModel) {
+              Column {
+                  ...
+                  Stub("FeatureOne")
+                  ...
+              }
+          }
+      }
+}
+```
 
 License
 ---------
