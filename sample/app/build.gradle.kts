@@ -42,7 +42,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.compose)
     implementation(projects.sample.designsystem)
     implementation(projects.sample.mainFeature)
     implementation(projects.sample.subFeatureOne)

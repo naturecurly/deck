@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "com.naturecurly.deck"
-    version = "0.1.0"
+    version = "0.2.0"
 
     plugins.withId("com.vanniktech.maven.publish.base") {
         configure<MavenPublishBaseExtension> {

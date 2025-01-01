@@ -36,8 +36,9 @@ android {
 }
 
 dependencies {
-    implementation(projects.compose)
-    ksp(projects.codegen)
+    implementation(libs.deck.compose)
+    ksp(libs.deck.codegen)
+
     implementation(projects.sample.designsystem)
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
