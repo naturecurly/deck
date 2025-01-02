@@ -22,7 +22,7 @@ class FeatureTwoConsumer @Inject constructor() : DeckConsumer<String, FeatureTwo
 
     override val uiStateFlow: StateFlow<FeatureTwoModel> = _uiStateFlow
 
-    override fun onEvent(event: Any) {
+    override fun <Any> onEvent(event: Any) {
         TODO("Not yet implemented")
     }
 }
