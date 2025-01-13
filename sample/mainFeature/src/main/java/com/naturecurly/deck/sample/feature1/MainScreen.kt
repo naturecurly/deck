@@ -10,22 +10,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.naturecurly.deck.compose.Deck
+import com.naturecurly.deck.compose.DeckPreview
+import com.naturecurly.deck.compose.DeckScope
 import com.naturecurly.deck.sample.designsystem.theme.DeckTheme
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModel()) {
     DeckTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Deck(viewModel) {
-                Column {
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                    Stub("FeatureOne")
-                    Stub("FeatureTwo")
-                }
-            }
+        Deck(viewModel) {
+            Content()
+        }
+    }
+}
+
+@Composable
+private fun DeckScope.Content() {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column {
+            Greeting(
+                name = "Android",
+                modifier = Modifier.padding(innerPadding)
+            )
+            Stub("FeatureOne")
+            Stub("FeatureTwo")
         }
     }
 }
@@ -42,6 +49,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     DeckTheme {
-        Greeting("Android")
+        DeckPreview {
+            Content()
+        }
     }
 }
