@@ -29,7 +29,7 @@ private fun DeckScope.Content() {
         Column {
             Greeting(
                 name = "Android",
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
             )
             Stub("FeatureOne")
             Stub("FeatureTwo")
@@ -41,7 +41,7 @@ private fun DeckScope.Content() {
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

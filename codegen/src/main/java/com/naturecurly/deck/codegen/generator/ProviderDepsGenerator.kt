@@ -32,22 +32,22 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
         // region Return Type
         val consumerSetReturnType = Set::class.asClassName().parameterizedBy(
             DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR).copy(
-                annotations = listOf(AnnotationSpec.builder(JvmSuppressWildcards::class).build())
-            )
+                annotations = listOf(AnnotationSpec.builder(JvmSuppressWildcards::class).build()),
+            ),
         )
         val containerToConsumerPairsReturnType = Set::class.asClassName().parameterizedBy(
             Pair::class.asClassName().parameterizedBy(
                 DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
                 KClass::class.asClassName().parameterizedBy(
                     WildcardTypeName.producerOf(
-                        DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR)
-                    )
-                )
+                        DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR),
+                    ),
+                ),
             ).copy(
                 annotations = listOf(
-                    AnnotationSpec.builder(JvmSuppressWildcards::class).build()
-                )
-            )
+                    AnnotationSpec.builder(JvmSuppressWildcards::class).build(),
+                ),
+            ),
         )
         // endregion
 
@@ -80,7 +80,7 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)
                         .addMember("%T::class", SingletonComponent::class)
-                        .build()
+                        .build(),
                 )
                 .addSuperinterface(deckDependenciesClassName)
                 .addFunction(functionProviderClass)

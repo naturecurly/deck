@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 internal data class ContainerEntry(
     val clazz: KClass<out DeckContainer<*, *>>,
     val container: DeckContainer<*, *>,
-    val consumer: ConsumerEntry
+    val consumer: ConsumerEntry,
 ) {
     init {
         consumer.addContainer(this)

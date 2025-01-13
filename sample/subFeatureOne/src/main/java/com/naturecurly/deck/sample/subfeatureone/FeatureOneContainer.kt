@@ -11,16 +11,18 @@ import com.naturecurly.deck.compose.DeckComposeContainer
 import javax.inject.Inject
 
 @Container
-class FeatureOneContainer @Inject constructor() :
-    DeckComposeContainer<String, FeatureOneDeckConsumer>() {
+class FeatureOneContainer @Inject constructor() : DeckComposeContainer<String, FeatureOneDeckConsumer>() {
     override val id: String
         get() = "FeatureOne"
 
     @Composable
     override fun Content() {
         val uiState by consumer.uiStateFlow.collectAsStateWithLifecycle()
-        Text(text = uiState, modifier = Modifier.clickable {
-            consumer.onEvent(Event.UpdateValueEvent)
-        })
+        Text(
+            text = uiState,
+            modifier = Modifier.clickable {
+                consumer.onEvent(Event.UpdateValueEvent)
+            },
+        )
     }
 }

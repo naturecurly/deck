@@ -8,7 +8,7 @@ import com.naturecurly.deck.Wharf
 import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
-class WharfImpl() : Wharf() {
+class WharfImpl : Wharf() {
     private var application: Application? = null
 
     // synchronizedMap is used to make the map thread-safe?
@@ -17,9 +17,14 @@ class WharfImpl() : Wharf() {
     internal fun init(context: Context) {
         entryPoints.clear()
         deckEntry.clear()
-        entryPoints.putAll(
-            EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies()
-        )
+        runCatching {
+            entryPoints.putAll(
+                EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies(),
+            )
+        }.onFailure {
+            // TODO: Error Handling
+            return
+        }
         if (context is Application) {
             application = context
         } else {
@@ -41,7 +46,7 @@ class WharfImpl() : Wharf() {
                     deckEntry.addConsumer(
                         providerIdentity = providerIdentity,
                         consumerClass = it::class,
-                        consumer = it
+                        consumer = it,
                     )
                 }
                 dependencies.containerToConsumerPairs().forEach { containerConsumerPair ->
@@ -49,7 +54,7 @@ class WharfImpl() : Wharf() {
                     deckEntry.addContainer(
                         containerClass = container::class,
                         consumerClass = containerConsumerPair.second,
-                        container = container
+                        container = container,
                     )
                     deckEntry.getDeckConsumer(container::class)?.let { consumer ->
                         container.setConsumer(consumer)

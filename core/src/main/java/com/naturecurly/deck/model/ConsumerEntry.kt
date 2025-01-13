@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 
 internal data class ConsumerEntry(
     val clazz: KClass<out DeckConsumer<*, *>>,
-    val consumer: DeckConsumer<*, *>
+    val consumer: DeckConsumer<*, *>,
 ) {
     val containers: MutableSet<ContainerEntry> = mutableSetOf<ContainerEntry>()
 

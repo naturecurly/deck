@@ -47,7 +47,7 @@ class ContainerModuleGenerator(
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)
                         .addMember("%T::class", SingletonComponent::class)
-                        .build()
+                        .build(),
                 )
                 .addFunction(functionProvideConsumer)
                 .build()

@@ -54,13 +54,13 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     val providerDepsClass =
                         providerDepsGenerator.generate(
                             providerId = it,
-                            destinationPackageName = destinationPackageName
+                            destinationPackageName = destinationPackageName,
                         )
                     providerModuleGenerator.generate(
                         providerId = it,
                         providerClassName = provider.toClassName(),
                         providerDepsInterfaceClassName = providerDepsClass,
-                        destinationPackageName = destinationPackageName
+                        destinationPackageName = destinationPackageName,
                     )
                 }
             }
@@ -88,7 +88,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     consumerModuleGenerator.generate(
                         providerId = bindTo,
                         consumerClassName = consumer.toClassName(),
-                        destinationPackageName = destinationPackageName
+                        destinationPackageName = destinationPackageName,
                     )
                 }
             }
@@ -126,7 +126,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     providerId = providerId,
                     containerClassName = container.toClassName(),
                     consumerClassName = consumerClassName,
-                    destinationPackageName = destinationPackageName
+                    destinationPackageName = destinationPackageName,
                 )
             }
         }
@@ -138,7 +138,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 when (annotation.shortName.asString()) {
                     Inject::class.simpleName,
                     jakarta.inject.Inject::class.simpleName,
-                        -> annotation.annotationType.resolve().declaration.qualifiedName?.asString()
+                    -> annotation.annotationType.resolve().declaration.qualifiedName?.asString()
                         .let { it == Inject::class.qualifiedName || it == jakarta.inject.Inject::class.qualifiedName }
 
                     else -> false

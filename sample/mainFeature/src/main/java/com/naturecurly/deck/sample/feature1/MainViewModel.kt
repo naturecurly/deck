@@ -9,7 +9,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 @Provider("MainFeature")
-class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
+class MainViewModel @Inject constructor() :
+    ViewModel(),
+    DeckProvider<String> {
     init {
         initDeckProvider(viewModelScope)
         onDeckReady(viewModelScope, "Hello, World!")

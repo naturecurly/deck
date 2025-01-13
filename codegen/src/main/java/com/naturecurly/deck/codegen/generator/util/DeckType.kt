@@ -19,15 +19,15 @@ internal fun getDeckQualifierAnnotation(providerId: String) =
 internal val deckProviderKClassReturnType =
     KClass::class.asClassName().parameterizedBy(
         WildcardTypeName.producerOf(
-            DeckProvider::class.asClassName().parameterizedBy(STAR)
-        )
+            DeckProvider::class.asClassName().parameterizedBy(STAR),
+        ),
     )
 
 internal val deckConsumerKClassReturnType =
     KClass::class.asClassName().parameterizedBy(
         WildcardTypeName.producerOf(
-            DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR)
-        )
+            DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR),
+        ),
     )
 
 internal val deckConsumerReturnType = DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR)
@@ -35,5 +35,5 @@ internal val deckConsumerReturnType = DeckConsumer::class.asClassName().paramete
 // Pair<DeckContainer<*, *>, KClass<out DeckConsumer<*, *>>>
 internal val deckContainerConsumerPairReturnType = Pair::class.asClassName().parameterizedBy(
     DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
-    deckConsumerKClassReturnType
+    deckConsumerKClassReturnType,
 )

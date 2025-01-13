@@ -11,8 +11,7 @@ import com.naturecurly.deck.sample.subfeaturetwo.model.FeatureTwoModel
 import javax.inject.Inject
 
 @Container
-class FeatureTwoContainer @Inject constructor() :
-    DeckComposeContainer<FeatureTwoModel, FeatureTwoConsumer>() {
+class FeatureTwoContainer @Inject constructor() : DeckComposeContainer<FeatureTwoModel, FeatureTwoConsumer>() {
     @Composable
     override fun Content() {
         val state by consumer.uiStateFlow.collectAsStateWithLifecycle()

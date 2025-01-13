@@ -9,8 +9,10 @@ import kotlinx.collections.immutable.toImmutableMap
 
 @Composable
 fun Deck(provider: DeckProvider<*>, content: @Composable DeckScope.() -> Unit) {
-    rememberDeckScope(provider.containers.filterValues { it is DeckComposeContainer<*, *> }
-        .mapValues { it.value as DeckComposeContainer }.toImmutableMap()).apply { content() }
+    rememberDeckScope(
+        provider.containers.filterValues { it is DeckComposeContainer<*, *> }
+            .mapValues { it.value as DeckComposeContainer }.toImmutableMap(),
+    ).apply { content() }
 }
 
 @Composable

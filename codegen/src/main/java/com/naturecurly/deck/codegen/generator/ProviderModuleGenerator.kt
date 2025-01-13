@@ -26,7 +26,7 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
         providerId: String,
         providerClassName: ClassName,
         providerDepsInterfaceClassName: ClassName,
-        destinationPackageName: String
+        destinationPackageName: String,
     ) {
         val deckModuleName =
             providerId.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() } + "DeckModule"
@@ -59,7 +59,7 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)
                         .addMember("%T::class", SingletonComponent::class)
-                        .build()
+                        .build(),
                 )
                 .addFunction(functionProvideDeckDeps)
                 .addFunction(functionProviderKClass)

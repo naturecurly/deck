@@ -40,7 +40,7 @@ class ConsumerModuleGenerator(private val codeGenerator: CodeGenerator) {
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)
                         .addMember("%T::class", SingletonComponent::class)
-                        .build()
+                        .build(),
                 )
                 .addFunction(functionBindConsumer)
                 .build()

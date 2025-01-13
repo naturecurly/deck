@@ -125,7 +125,7 @@ class FeatureOneContainer @Inject constructor() :DeckComposeContainer<FeatureOne
             Text(state.subtitle)
         }
     }
-    // ID of the UI, and it will used to locate the container in the primary feature's UI 
+    // ID of the UI, and it will used to locate the container in the primary feature's UI
     override val id: String = "FeatureOne"
 }
 ```

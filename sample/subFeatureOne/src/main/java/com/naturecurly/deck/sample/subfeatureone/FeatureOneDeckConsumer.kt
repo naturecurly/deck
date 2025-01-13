@@ -22,7 +22,7 @@ class FeatureOneDeckConsumer @Inject constructor() : DeckConsumer<String, String
     override val uiStateFlow: StateFlow<String> = _uiStateFlow
 
     override fun <Event> onEvent(event: Event) {
-        when(event) {
+        when (event) {
             UpdateValueEvent -> _uiStateFlow.value = "Updated FeatureOne"
         }
     }
