@@ -8,13 +8,45 @@ Deck is a pluggable UI framework for Android Jetpack Compose. It addresses the c
 
 _Note: This framework requires use of [KSP](https://github.com/google/ksp) and [Hilt](https://github.com/google/dagger) in your project_
 
-Download
+What is the problem?
+--------
+In large-scale modular projects, directly coupling the main feature module with multiple child modules creates tight dependencies. This approach results in challenges such as:
+
+- **Scalability Issues**: Adding or modifying child modules requires changes in the main module.
+- **Codebase Maintenance**: Increased complexity makes refactoring and updates harder.
+- **Build Time**: Direct dependencies between modules can lead to longer build times, especially in large projects.
+- **Testability**: High coupling complicates unit and integration testing.
+
+Why Deck?
+--------
+This library addresses these issues by enabling a decoupled architecture, where the main module remains agnostic of specific child modules.
+- **Decoupled Architecture**
+    - The main module only interacts with abstract interfaces or contracts. Child modules implement these interfaces and inject their UI at runtime.
+- **Improved Scalability**
+    - Adding or removing a child module doesn’t require changes to the main module. The main module dynamically discovers and integrates available child modules.
+- **Reduced Build Time**
+    - Since the main module doesn’t directly depend on child modules, changes in one child module don’t trigger a rebuild of the main module.
+- **Simplified Testing**
+    - The main module can be tested independently of child modules. Mock implementations can be used for child module contracts.
+- **Better Team Collaboration**
+    - Teams working on different modules can work in isolation, minimizing merge conflicts and dependencies.
+ 
+How It Works
+--------
+- Define Contracts
+    - The main module implements Deck's contracts(Provider) that describe the main feature behavior.
+- Implement Contracts in Child Modules
+    - Each child module implements Deck's contracts(Consumer and Container) and registers itself using `Hilt`(IoC).
+- Runtime Injection
+    - At runtime, the library dynamically discovers child modules and injects their UI into the main module based on the contracts. The main module can then inject child modules' UI at any place.
+
+Getting Started
 --------
 
 Download [the latest JAR](https://repo1.maven.org/maven2/com/naturecurly/deck/deck-compose/0.1.0/deck-compose-0.1.0.aar) or depend via Gradle:
 ```kotlin
-implementation("com.naturecurly.deck:deck-compose:0.1.0")
-ksp("com.naturecurly.deck:deck-codegen:0.1.0")
+implementation("com.naturecurly.deck:deck-compose:0.2.0")
+ksp("com.naturecurly.deck:deck-codegen:0.2.0")
 ```
 
 Usage
