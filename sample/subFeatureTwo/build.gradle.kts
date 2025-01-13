@@ -36,9 +36,10 @@ android {
 }
 
 dependencies {
+    //    implementation(libs.deck.compose)
+//    ksp(libs.deck.codegen)
     implementation(projects.compose)
-//    implementation(libs.deck.compose)
-    ksp(libs.deck.codegen)
+    ksp(projects.codegen)
 
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
@@ -47,7 +48,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

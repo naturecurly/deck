@@ -8,6 +8,7 @@ dependencies {
     implementation(projects.core)
     implementation(libs.kotlinpoet.ksp)
     implementation(libs.hilt.core)
+    implementation(libs.jakarta.inject)
     compileOnly(libs.ksp)
     compileOnly(libs.ksp.api)
 }

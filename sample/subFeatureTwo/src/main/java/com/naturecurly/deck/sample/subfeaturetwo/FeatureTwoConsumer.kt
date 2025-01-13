@@ -3,10 +3,10 @@ package com.naturecurly.deck.sample.subfeaturetwo
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.annotations.Consumer
 import com.naturecurly.deck.sample.subfeaturetwo.model.FeatureTwoModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Consumer(bindTo = "MainFeature")
 class FeatureTwoConsumer @Inject constructor() : DeckConsumer<String, FeatureTwoModel>() {
