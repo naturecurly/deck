@@ -30,7 +30,7 @@ This library addresses these issues by enabling a decoupled architecture, where 
     - The main module can be tested independently of child modules. Mock implementations can be used for child module contracts.
 - **Better Team Collaboration**
     - Teams working on different modules can work in isolation, minimizing merge conflicts and dependencies.
- 
+
 How It Works
 --------
 - Define Contracts
