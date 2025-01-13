@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "com.naturecurly.deck"
-    version = "0.2.0"
+    version = "0.3.0"
 
     plugins.withId("com.vanniktech.maven.publish.base") {
         configure<MavenPublishBaseExtension> {
@@ -24,7 +24,7 @@ allprojects {
 
             pom {
                 description.set("A Pluggable UI Framework for Compose")
-                name.set(project.name)
+                name.set("deck-${project.name}")
                 url.set("https://github.com/naturecurly/deck/")
                 licenses {
                     license {

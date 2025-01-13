@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 
 @Immutable
-interface DeckScope {
-    val containers: Map<String, DeckComposeContainer<*, *>>
+abstract class DeckScope {
+    protected abstract val containers: Map<String, DeckComposeContainer<*, *>>
 
     @Composable
     fun Stub(containerId: String) {
