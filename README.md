@@ -23,7 +23,7 @@ This library addresses these issues by enabling a decoupled architecture, where 
 - **Decoupled Architecture**
     - The main module only interacts with abstract interfaces or contracts. Child modules implement these interfaces and inject their UI at runtime.
 - **Improved Scalability**
-    - Adding or removing a child module doesn’t require changes to the main module. The main module dynamically discovers and integrates available child modules.
+    - Adding or removing a child module only requires minimal changes in the main module. The framework dynamically discovers and integrates available child modules.
 - **Reduced Build Time**
     - Since the main module doesn’t directly depend on child modules, changes in one child module don’t trigger a rebuild of the main module.
 - **Simplified Testing**
@@ -40,13 +40,15 @@ How It Works
 - Runtime Injection
     - At runtime, the library dynamically discovers child modules and injects their UI into the main module based on the contracts. The main module can then inject child modules' UI at any place.
 
+![architecture graph](./arch_graph.png)
+
 Getting Started
 --------
 
 Download [the latest JAR](https://repo1.maven.org/maven2/com/naturecurly/deck/deck-compose/0.1.0/deck-compose-0.1.0.aar) or depend via Gradle:
 ```kotlin
-implementation("com.naturecurly.deck:deck-compose:0.2.0")
-ksp("com.naturecurly.deck:deck-codegen:0.2.0")
+implementation("com.naturecurly.deck:deck-compose:0.3.0")
+ksp("com.naturecurly.deck:deck-codegen:0.3.0")
 ```
 
 Usage

@@ -22,7 +22,7 @@ immutableCollection = "0.3.8"
 kotlinpoet = "2.0.0"
 coroutines = "1.8.0"
 jakartaInject = "2.0.1"
-deck = "0.1.0"
+deck = "0.3.0"
 lint = "31.7.3"
 
 [libraries]

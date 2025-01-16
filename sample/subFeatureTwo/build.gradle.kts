@@ -42,10 +42,10 @@ android {
 }
 
 dependencies {
-    //    implementation(libs.deck.compose)
-//    ksp(libs.deck.codegen)
-    implementation(projects.compose)
-    ksp(projects.codegen)
+    implementation(libs.deck.compose)
+    ksp(libs.deck.codegen)
+//    implementation(projects.compose)
+//    ksp(projects.codegen)
 
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
