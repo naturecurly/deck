@@ -25,6 +25,7 @@ rootProject.name = "Deck"
 include(":core")
 include(":compose")
 include(":codegen")
+include(":lint")
 include(":sample:app")
 include(":sample:mainFeature")
 include(":sample:subFeatureOne")
