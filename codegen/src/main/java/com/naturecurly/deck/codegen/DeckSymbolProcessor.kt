@@ -48,15 +48,18 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
             }
 
             if (provider is KSClassDeclaration) {
+                val originatingFile = provider.containingFile!!
                 val providerId = provider.getAnnotationsByType(Provider::class).firstOrNull()?.id
                 val destinationPackageName = provider.packageName.asString() + ".di"
                 providerId?.let {
                     val providerDepsClass =
                         providerDepsGenerator.generate(
+                            originatingFile = originatingFile,
                             providerId = it,
                             destinationPackageName = destinationPackageName,
                         )
                     providerModuleGenerator.generate(
+                        originatingFile = originatingFile,
                         providerId = it,
                         providerClassName = provider.toClassName(),
                         providerDepsInterfaceClassName = providerDepsClass,
@@ -77,6 +80,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 continue
             }
             if (consumer is KSClassDeclaration) {
+                val originatingFile = consumer.containingFile!!
                 if (consumer.classKind != ClassKind.CLASS || !hasInjectAnnotation(consumer)) {
                     logger.error("$consumer must be a Class with @Inject constructor()")
                     continue
@@ -86,6 +90,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 bindTo?.let {
                     consumerProviderIdMap[consumer.toClassName()] = bindTo
                     consumerModuleGenerator.generate(
+                        originatingFile = originatingFile,
                         providerId = bindTo,
                         consumerClassName = consumer.toClassName(),
                         destinationPackageName = destinationPackageName,
@@ -107,6 +112,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 continue
             }
             if (container is KSClassDeclaration) {
+                val originatingFile = container.containingFile!!
                 if (container.classKind != ClassKind.CLASS || !hasInjectAnnotation(container)) {
                     logger.error("$container must be a Class with @Inject constructor()")
                     continue
@@ -123,6 +129,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     continue
                 }
                 containerModuleGenerator.generate(
+                    originatingFile = originatingFile,
                     providerId = providerId,
                     containerClassName = container.toClassName(),
                     consumerClassName = consumerClassName,

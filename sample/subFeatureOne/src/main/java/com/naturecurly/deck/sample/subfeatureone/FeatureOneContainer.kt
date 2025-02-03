@@ -16,11 +16,11 @@ class FeatureOneContainer @Inject constructor() : DeckComposeContainer<String, F
         get() = "FeatureOne"
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val uiState by consumer.uiStateFlow.collectAsStateWithLifecycle()
         Text(
             text = uiState,
-            modifier = Modifier.clickable {
+            modifier = modifier.clickable {
                 consumer.onEvent(Event.UpdateValueEvent)
             },
         )

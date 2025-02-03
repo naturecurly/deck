@@ -1,6 +1,7 @@
 package com.naturecurly.deck.codegen.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.symbol.KSFile
 import com.naturecurly.deck.codegen.generator.util.deckDependenciesClassName
 import com.naturecurly.deck.codegen.generator.util.deckProviderKClassReturnType
 import com.naturecurly.deck.codegen.generator.util.getDeckQualifierAnnotation
@@ -12,6 +13,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.writeTo
 import dagger.Module
 import dagger.Provides
@@ -23,6 +25,7 @@ import java.util.Locale
 
 class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
     fun generate(
+        originatingFile: KSFile,
         providerId: String,
         providerClassName: ClassName,
         providerDepsInterfaceClassName: ClassName,
@@ -39,6 +42,7 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
                 .parameterizedBy(WildcardTypeName.producerOf(deckDependenciesClassName))
 
         val functionProvideDeckDeps = FunSpec.builder("provideDeckDependencies")
+            .addOriginatingKSFile(originatingFile)
             .addAnnotation(IntoMap::class)
             .addAnnotation(Provides::class)
             .addAnnotation(classKeyAnnotation)
@@ -47,6 +51,7 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
             .build()
 
         val functionProviderKClass = FunSpec.builder("provideDeckProviderKClass")
+            .addOriginatingKSFile(originatingFile)
             .addAnnotation(Provides::class)
             .addAnnotation(getDeckQualifierAnnotation(providerId))
             .returns(deckProviderKClassReturnType)
@@ -55,6 +60,7 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
 
         val deckModuleType =
             TypeSpec.classBuilder(deckModuleName)
+                .addOriginatingKSFile(originatingFile)
                 .addAnnotation(Module::class)
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)

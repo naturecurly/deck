@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.naturecurly.deck.annotations.Container
 import com.naturecurly.deck.compose.DeckComposeContainer
@@ -13,9 +14,9 @@ import javax.inject.Inject
 @Container
 class FeatureTwoContainer @Inject constructor() : DeckComposeContainer<FeatureTwoModel, FeatureTwoConsumer>() {
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val state by consumer.uiStateFlow.collectAsStateWithLifecycle()
-        Column {
+        Column(modifier) {
             Text(state.title)
             Text(state.subtitle)
         }

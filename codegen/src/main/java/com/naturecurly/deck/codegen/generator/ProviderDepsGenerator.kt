@@ -1,6 +1,7 @@
 package com.naturecurly.deck.codegen.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.symbol.KSFile
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.codegen.generator.util.deckDependenciesClassName
@@ -16,6 +17,7 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.writeTo
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -24,7 +26,7 @@ import java.util.Locale
 import kotlin.reflect.KClass
 
 class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
-    fun generate(providerId: String, destinationPackageName: String): ClassName {
+    fun generate(originatingFile: KSFile, providerId: String, destinationPackageName: String): ClassName {
         val deckDependenciesInterfaceName =
             providerId.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() } + "DeckDependencies"
         val deckQualifierAnnotation = getDeckQualifierAnnotation(providerId)
@@ -53,6 +55,7 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
 
         // region Functions
         val functionProviderClass = FunSpec.builder("providerClass")
+            .addOriginatingKSFile(originatingFile)
             .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
             .addModifiers(KModifier.ABSTRACT)
@@ -60,6 +63,7 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
             .build()
 
         val functionConsumer = FunSpec.builder("consumers")
+            .addOriginatingKSFile(originatingFile)
             .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
             .addModifiers(KModifier.ABSTRACT)
@@ -67,6 +71,7 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
             .build()
 
         val functionContainerToConsumerPairs = FunSpec.builder("containerToConsumerPairs")
+            .addOriginatingKSFile(originatingFile)
             .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
             .addModifiers(KModifier.ABSTRACT)
@@ -76,6 +81,7 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
 
         val deckDependenciesInterfaceType =
             TypeSpec.interfaceBuilder(deckDependenciesInterfaceName)
+                .addOriginatingKSFile(originatingFile)
                 .addAnnotation(EntryPoint::class)
                 .addAnnotation(
                     AnnotationSpec.builder(InstallIn::class)
