@@ -43,6 +43,10 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
         targetExclude("**/Dependencies.kt", "**/build/**")
+        suppressLintsFor {
+            step = "ktlint"
+            shortCode = "standard:backing-property-naming"
+        }
     }
     kotlinGradle {
         ktlint(libs.ktlint.get().version)
