@@ -18,7 +18,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
-import java.util.Locale
 
 class ContainerModuleGenerator(
     private val codeGenerator: CodeGenerator,
@@ -31,8 +30,7 @@ class ContainerModuleGenerator(
         consumerClassName: ClassName,
         destinationPackageName: String,
     ) {
-        val deckModuleName =
-            providerId.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() } + "ContainerModule"
+        val deckModuleName = containerClassName.simpleName + "Module"
         val containerParameter = ParameterSpec.builder("container", containerClassName).build()
 
         val functionProvideConsumer = FunSpec.builder("provideContainer")

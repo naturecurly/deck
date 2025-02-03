@@ -11,7 +11,7 @@ import com.naturecurly.deck.compose.DeckComposeContainer
 import com.naturecurly.deck.sample.subfeaturetwo.model.FeatureTwoModel
 import javax.inject.Inject
 
-@Container
+@Container(bindTo = "MainFeature")
 class FeatureTwoContainer @Inject constructor() : DeckComposeContainer<FeatureTwoModel, FeatureTwoConsumer>() {
     @Composable
     override fun Content(modifier: Modifier) {

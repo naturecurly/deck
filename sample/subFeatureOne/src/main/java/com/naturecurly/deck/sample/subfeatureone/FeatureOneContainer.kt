@@ -10,7 +10,7 @@ import com.naturecurly.deck.annotations.Container
 import com.naturecurly.deck.compose.DeckComposeContainer
 import javax.inject.Inject
 
-@Container
+@Container(bindTo = "MainFeature")
 class FeatureOneContainer @Inject constructor() : DeckComposeContainer<String, FeatureOneDeckConsumer>() {
     override val id: String
         get() = "FeatureOne"

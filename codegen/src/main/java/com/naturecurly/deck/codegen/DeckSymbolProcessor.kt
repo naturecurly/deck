@@ -33,8 +33,8 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         processProviders(resolver)
-        val consumerProviderMap = processConsumers(resolver)
-        processContainers(resolver, consumerProviderMap)
+        processConsumers(resolver)
+        processContainers(resolver)
         return emptyList()
     }
 
@@ -71,9 +71,8 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
     }
 
     @OptIn(KspExperimental::class)
-    private fun processConsumers(resolver: Resolver): Map<ClassName, String> {
+    private fun processConsumers(resolver: Resolver) {
         val consumers = resolver.getSymbolsWithAnnotation(CONSUMER_CLASS_NAME)
-        val consumerProviderIdMap = hashMapOf<ClassName, String>()
         for (consumer in consumers) {
             if (consumer !is KSDeclaration) {
                 logger.error("@Consumer can't be applied to $consumer")
@@ -88,7 +87,6 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 val bindTo = consumer.getAnnotationsByType(Consumer::class).firstOrNull()?.bindTo
                 val destinationPackageName = consumer.packageName.asString() + ".di"
                 bindTo?.let {
-                    consumerProviderIdMap[consumer.toClassName()] = bindTo
                     consumerModuleGenerator.generate(
                         originatingFile = originatingFile,
                         providerId = bindTo,
@@ -98,13 +96,10 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 }
             }
         }
-        return consumerProviderIdMap
     }
 
-    private fun processContainers(
-        resolver: Resolver,
-        consumerProviderIdMap: Map<ClassName, String>,
-    ) {
+    @OptIn(KspExperimental::class)
+    private fun processContainers(resolver: Resolver) {
         val containers = resolver.getSymbolsWithAnnotation(CONTAINER_CLASS_NAME)
         for (container in containers) {
             if (container !is KSDeclaration) {
@@ -123,9 +118,9 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     logger.error("$container does not implement a DeckContainer with a valid DeckConsumer")
                     continue
                 }
-                val providerId = consumerProviderIdMap[consumerClassName]
-                if (providerId == null) {
-                    logger.error("Couldn't find a providerId for $consumerClassName. Are the $consumerClassName and $container inside the same module? ")
+                val providerId = container.getAnnotationsByType(Container::class).firstOrNull()?.bindTo
+                if (providerId.isNullOrBlank()) {
+                    logger.error("providerId is not provided.")
                     continue
                 }
                 containerModuleGenerator.generate(

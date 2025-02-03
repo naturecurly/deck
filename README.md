@@ -116,13 +116,13 @@ class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOne
 ```
 4. Create a Container for UI which will be injected into the primary feature. The container is marked with @Container, and it extends the `DeckComposeContainer`. The `FeatureOneModel` is the input type, and the `FeatureOneConsumer` is the UI data source.
 ```kotlin
-@Container
+@Container(bindTo = "MainFeature")
 class FeatureOneContainer @Inject constructor() :DeckComposeContainer<FeatureOneModel, FeatureOneConsumer>() {
     // UI content
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val state by consumer.uiStateFlow.collectAsStateWithLifecycle()
-        Column {
+        Column(modifier) {
             Text(state.title)
             Text(state.subtitle)
         }
