@@ -58,7 +58,7 @@ spotless {
 
 allprojects {
     group = "com.naturecurly.deck"
-    version = "0.4.0"
+    version = "0.5.0"
 
     plugins.withId("com.vanniktech.maven.publish.base") {
         configure<MavenPublishBaseExtension> {
