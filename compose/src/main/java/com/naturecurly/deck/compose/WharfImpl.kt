@@ -58,7 +58,7 @@ class WharfImpl : Wharf() {
                         container = container,
                     )
                     deckEntry.getDeckConsumer(container::class)?.let { consumer ->
-                        container.setConsumer(consumer)
+                        setConsumerToContainer(container, consumer)
                     }
                 }
             }

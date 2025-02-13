@@ -5,7 +5,7 @@ abstract class DeckContainer<INPUT, CONSUMER : DeckConsumer<*, INPUT>> {
     protected lateinit var consumer: CONSUMER
         private set
 
-    fun setConsumer(consumer: DeckConsumer<*, *>) {
+    internal fun setConsumer(consumer: DeckConsumer<*, *>) {
         @Suppress("UNCHECKED_CAST")
         this.consumer = consumer as CONSUMER
     }

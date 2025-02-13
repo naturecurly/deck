@@ -18,11 +18,23 @@ abstract class Wharf : ProviderRegister {
             registerNewProvider<INPUT>(providerClass, providerIdentity)
         }
         @Suppress("UNCHECKED_CAST")
-        return deckEntry.getDeckConsumers(providerIdentity).filter { it.isEnabled }.toSet() as Set<DeckConsumer<INPUT, *>>
+        return deckEntry.getDeckConsumers(providerIdentity).filter { it.isEnabled }
+            .toSet() as Set<DeckConsumer<INPUT, *>>
     }
 
-    internal fun getDeckContainers(providerIdentity: Int, filterDisabled: Boolean = true): Map<String, DeckContainer<*, *>> {
-        return deckEntry.getContainersByProvider(providerIdentity, filterDisabled).associate { it.id to it }
+    internal fun getDeckContainers(
+        providerIdentity: Int,
+        filterDisabled: Boolean = true,
+    ): Map<String, DeckContainer<*, *>> {
+        return deckEntry.getContainersByProvider(providerIdentity, filterDisabled)
+            .associate { it.id to it }
+    }
+
+    protected fun setConsumerToContainer(
+        container: DeckContainer<*, *>,
+        consumer: DeckConsumer<*, *>,
+    ) {
+        container.setConsumer(consumer)
     }
 
     internal fun clearProvider(providerIdentity: Int) {
