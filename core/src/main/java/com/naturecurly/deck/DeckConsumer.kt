@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 abstract class DeckConsumer<INPUT, OUTPUT> {
+    open val isEnabled: Boolean = true
     abstract fun init(scope: CoroutineScope)
     abstract fun onDataReady(scope: CoroutineScope, data: INPUT)
     abstract val uiStateFlow: StateFlow<OUTPUT>

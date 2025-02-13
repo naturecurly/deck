@@ -5,6 +5,7 @@ import android.content.Context
 import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.Wharf
+import com.naturecurly.deck.compose.log.DeckLog
 import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
@@ -22,13 +23,13 @@ class WharfImpl : Wharf() {
                 EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies(),
             )
         }.onFailure {
-            // TODO: Error Handling
+            DeckLog.e("WharfImpl initialization failed")
             return
         }
         if (context is Application) {
             application = context
         } else {
-            // Warning: context is not an instance of Application
+            DeckLog.w("Context is not an instance of Application")
         }
     }
 

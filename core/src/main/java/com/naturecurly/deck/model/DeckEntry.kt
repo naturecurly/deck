@@ -34,7 +34,7 @@ class DeckEntry {
         }
     }
 
-    fun clearProvider(providerIdentity: Int) {
+    internal fun clearProvider(providerIdentity: Int) {
         val consumersToBeCleared = providers.remove(providerIdentity)?.clear()
         consumersToBeCleared?.forEach { consumer ->
             val containersToBeCleared = consumers.remove(consumer)?.clear()
@@ -50,11 +50,11 @@ class DeckEntry {
         containers.clear()
     }
 
-    fun containsProvider(providerIdentity: Int): Boolean {
+    internal fun containsProvider(providerIdentity: Int): Boolean {
         return providers.contains(providerIdentity)
     }
 
-    fun getDeckConsumers(providerIdentity: Int): Set<DeckConsumer<*, *>> {
+    internal fun getDeckConsumers(providerIdentity: Int): Set<DeckConsumer<*, *>> {
         return providers[providerIdentity]?.consumers?.map { it.consumer }?.toSet() ?: emptySet()
     }
 
@@ -62,8 +62,19 @@ class DeckEntry {
         return containers[containerClass]?.consumer?.consumer
     }
 
-    fun getContainersByProvider(providerIdentity: Int): Set<DeckContainer<*, *>> {
-        return providers[providerIdentity]?.consumers?.flatMap { it.containers }
+    internal fun getContainersByProvider(
+        providerIdentity: Int,
+        filterDisabled: Boolean,
+    ): Set<DeckContainer<*, *>> {
+        return providers[providerIdentity]?.consumers
+            ?.run {
+                if (filterDisabled) {
+                    filter { it.consumer.isEnabled }
+                } else {
+                    this
+                }
+            }
+            ?.flatMap { it.containers }
             ?.map { it.container }
             ?.toSet() ?: emptySet()
     }

@@ -64,8 +64,8 @@ ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.re
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 
-lint-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "lint"}
-lint-check = { group = "com.android.tools.lint", name = "lint-checks", version.ref = "lint"}
+lint-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "lint" }
+lint-check = { group = "com.android.tools.lint", name = "lint-checks", version.ref = "lint" }
 
 # Dummy library for klint
 googleJavaFormat = "com.google.googlejavaformat:google-java-format:1.25.2"
