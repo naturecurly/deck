@@ -19,8 +19,10 @@ class DeckEntry {
         consumer: DeckConsumer<*, *>,
     ) {
         val consumerEntry = ConsumerEntry(consumerClass, consumer)
-        providers[providerIdentity]?.addConsumer(consumerEntry)
-        consumers[consumerClass] = consumerEntry
+        providers[providerIdentity]?.let { provider ->
+            provider.addConsumer(consumerEntry)
+            consumers[consumerClass] = consumerEntry
+        }
     }
 
     fun addContainer(

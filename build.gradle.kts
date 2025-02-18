@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.spotless)
+    alias(libs.plugins.kover)
 }
 
 spotless {
