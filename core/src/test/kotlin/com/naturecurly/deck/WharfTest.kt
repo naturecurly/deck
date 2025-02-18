@@ -85,8 +85,9 @@ class WharfTest {
     fun `verify WharfLocal`() {
         // Given
         val wharfImpl = WharfTest(listOf())
+        val actual = WharfLocal.get()
         // Then
-        assertThat(wharfImpl).isEqualTo(WharfLocal.get())
+        assertThat(actual).isEqualTo(wharfImpl)
     }
 
     class WharfTest(private val consumerContainerPairs: List<Pair<DeckContainer<*, *>, DeckConsumer<*, *>>>) : Wharf() {

@@ -1,6 +1,10 @@
 package com.naturecurly.deck
 
 internal object WharfLocal {
-    internal lateinit var wharf: Wharf
+    private lateinit var wharf: Wharf
+    internal fun init(wharf: Wharf) {
+        this.wharf = wharf
+    }
+
     internal fun get() = wharf
 }

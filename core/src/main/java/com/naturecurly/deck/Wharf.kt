@@ -6,7 +6,7 @@ abstract class Wharf : ProviderRegister {
     protected val deckEntry = DeckEntry()
 
     init {
-        WharfLocal.wharf = this
+        WharfLocal.init(this)
     }
 
     internal fun <INPUT> getDeckConsumers(
