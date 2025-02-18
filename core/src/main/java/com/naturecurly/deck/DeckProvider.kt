@@ -6,11 +6,12 @@ import kotlinx.coroutines.launch
 
 interface DeckProvider<OUTPUT> {
     private val consumers: Set<DeckConsumer<OUTPUT, *>>
-        get() = WharfLocal.get().getDeckConsumers(this::class, System.identityHashCode(this))
+        get() = WharfLocal.get().getDeckConsumers(System.identityHashCode(this))
     val containers: Map<String, DeckContainer<*, *>>
         get() = WharfLocal.get().getDeckContainers(System.identityHashCode(this))
 
     fun initDeckProvider(scope: CoroutineScope) {
+        WharfLocal.get().registerNewProvider<OUTPUT>(this::class, System.identityHashCode(this))
         consumers.forEach { it.init(scope) }
         val consumersFlow = merge(*(consumers.map { it.consumerEventFlow }.toTypedArray()))
         scope.launch {
