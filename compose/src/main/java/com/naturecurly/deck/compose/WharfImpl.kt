@@ -23,7 +23,7 @@ class WharfImpl : Wharf() {
                 EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies(),
             )
         }.onFailure {
-            DeckLog.e("WharfImpl initialization failed")
+            DeckLog.e("WharfImpl initialization failed", it)
             return
         }
         if (context is Application) {

@@ -1,9 +1,12 @@
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.kover)
 }
 
 android {
@@ -41,6 +44,28 @@ android {
     }
 }
 
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "com.naturecurly.deck.compose.DeckKt",
+                    "com.naturecurly.deck.compose.DeckComposeContainer",
+                    "com.naturecurly.deck.compose.DeckInitializer",
+                    "com.naturecurly.deck.compose.DeckScope",
+                    "com.naturecurly.deck.compose.DeckScopeImpl",
+                )
+            }
+        }
+        verify {
+            rule {
+                minBound(95, CoverageUnit.LINE)
+                minBound(80, CoverageUnit.BRANCH)
+            }
+        }
+    }
+}
+
 dependencies {
     api(projects.core)
     implementation(platform(libs.androidx.compose.bom))
@@ -50,9 +75,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.startup.runtime)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.mockk)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     lintPublish(projects.lint)
 }
