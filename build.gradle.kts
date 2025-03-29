@@ -30,6 +30,7 @@ spotless {
         configureCommonJavaFormat()
         target("**/*.java")
         targetExclude("**/build/**")
+        licenseHeaderFile("license-header.txt")
     }
     kotlin {
         ktlint(libs.ktlint.get().version)
@@ -41,6 +42,7 @@ spotless {
                 ),
             )
         target("**/*.kt")
+        licenseHeaderFile("license-header.txt")
         trimTrailingWhitespace()
         endWithNewline()
         targetExclude("**/Dependencies.kt", "**/build/**")
