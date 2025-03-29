@@ -35,9 +35,9 @@ abstract class DeckScope {
 
     @SuppressLint("RememberReturnType")
     @Composable
-    fun Stub(containerId: String, modifier: Modifier = Modifier) {
-        containerUis[containerId]?.Content(modifier) ?: remember(containerId) {
-            DeckLog.w("Not found containerId: $containerId")
+    fun Stub(containerUiId: String, modifier: Modifier = Modifier) {
+        containerUis[containerUiId]?.Content(modifier) ?: remember(containerUiId) {
+            DeckLog.w("Not found containerId: $containerUiId")
         }
     }
 }

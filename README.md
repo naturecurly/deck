@@ -36,7 +36,7 @@ How It Works
 - Define Contracts
     - The main module implements Deck's contracts(Provider) that describe the main feature behavior.
 - Implement Contracts in Child Modules
-    - Each child module implements Deck's contracts(Consumer and Container) and registers itself using `Hilt`(IoC).
+    - Each child module implements Deck's contracts(Container and ContainerUi) and registers itself using `Hilt`(IoC).
 - Runtime Injection
     - At runtime, the library dynamically discovers child modules and injects their UI into the main module based on the contracts. The main module can then inject child modules' UI at any place.
 
@@ -47,8 +47,8 @@ Getting Started
 
 Download [the latest JAR](https://repo1.maven.org/maven2/com/naturecurly/deck/deck-compose/0.1.0/deck-compose-0.1.0.aar) or depend via Gradle:
 ```kotlin
-implementation("com.naturecurly.deck:deck-compose:0.4.0")
-ksp("com.naturecurly.deck:deck-codegen:0.4.0")
+implementation("com.naturecurly.deck:deck-compose:0.6.0")
+ksp("com.naturecurly.deck:deck-codegen:0.6.0")
 ```
 
 Usage
@@ -83,20 +83,20 @@ class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
 }
 ```
 ### Subfeatures
-1. Create a Consumer for the primary feature and extend the `DeckConsumer`. The `String` is the input type from the DeckProvider(MainViewModel), and the `FeatureOneModel` is the output that will be consumed by UI:
+1. Create a Container for the primary feature and extend the `DeckContainer`. The `String` is the input type from the DeckProvider(MainViewModel), and the `FeatureOneModel` is the output that will be consumed by UI:
 ```kotlin
-// Note: Please add @Inject constructor to your consumer to enable Hilt to inject automatically
-class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() { ... }
+// Note: Please add @Inject constructor to your container to enable Hilt to inject automatically
+class FeatureOneContainer @Inject constructor() : DeckContainer<String, FeatureOneModel>() { ... }
 ```
-2. Mark the class with the @Consumer annotation, and the annotation parameter should be the primary feature's id which was defined above:
+2. Mark the class with the @Container annotation, and the annotation parameter should be the primary feature's id which was defined above:
 ```kotlin
-@Consumer(bindTo = "MainFeature")
-class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() { ... }
+@Container(bindTo = "MainFeature")
+class FeatureOneContainer @Inject constructor() : DeckContainer<String, FeatureOneModel>() { ... }
 ```
-3. Implement the functions in the DeckConsumer. The `uiStateFlow` can be listened to in your UI code later and the `onEvent()` is to handle events from UI:
+3. Implement the functions in the DeckContainer. The `uiStateFlow` can be listened to in your UI code later and the `onEvent()` is to handle events from UI:
 ```kotlin
-@Consumer(bindTo = "MainFeature")
-class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOneModel>() {
+@Container(bindTo = "MainFeature")
+class FeatureOneContainer @Inject constructor() : DeckContainer<String, FeatureOneModel>() {
     override fun init(scope: CoroutineScope) {
         ...
     }
@@ -114,25 +114,25 @@ class FeatureOneConsumer @Inject constructor() : DeckConsumer<String, FeatureOne
     }
 }
 ```
-4. Create a Container for UI which will be injected into the primary feature. The container is marked with @Container, and it extends the `DeckComposeContainer`. The `FeatureOneModel` is the input type, and the `FeatureOneConsumer` is the UI data source.
+4. Create a ContainerUi for UI which will be injected into the primary feature. The containerUi is marked with @ContainerUi, and it extends the `DeckComposeContainerUi`. The `FeatureOneModel` is the input type, and the `FeatureOneContainer` is the UI data source.
 ```kotlin
-@Container(bindTo = "MainFeature")
-class FeatureOneContainer @Inject constructor() :DeckComposeContainer<FeatureOneModel, FeatureOneConsumer>() {
+@ContainerUi(bindTo = "MainFeature")
+class FeatureOneContainerUi @Inject constructor() :DeckComposeContainerUi<FeatureOneModel, FeatureOneContainer>() {
     // UI content
     @Composable
     override fun Content(modifier: Modifier) {
-        val state by consumer.uiStateFlow.collectAsStateWithLifecycle()
+        val state by container.uiStateFlow.collectAsStateWithLifecycle()
         Column(modifier) {
             Text(state.title)
             Text(state.subtitle)
         }
     }
-    // ID of the UI, and it will used to locate the container in the primary feature's UI
+    // ID of the UI, and it will used to locate the container ui in the primary feature's UI
     override val id: String = "FeatureOne"
 }
 ```
 ### Inject Subfeatures' UI to the Primary Feature UI
-Call `Deck(provider: DeckProvider) {}` in your primary feature's composable code, and in the block, you can add any composable code. In the DeckScope, `Stub(containerId: String)` is used to inject the target subfeature's container(UI)
+Call `Deck(provider: DeckProvider) {}` in your primary feature's composable code, and in the block, you can add any composable code. In the DeckScope, `Stub(containerUiId: String)` is used to inject the target subfeature's containerUi
 ```kotlin
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModel()) {
