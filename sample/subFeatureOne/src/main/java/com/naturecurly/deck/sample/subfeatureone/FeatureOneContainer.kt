@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @Container(bindTo = "MainFeature")
-class FeatureOneDeckContainer @Inject constructor() : DeckContainer<String, String>() {
+class FeatureOneContainer @Inject constructor() : DeckContainer<String, String>() {
     private val _uiStateFlow = MutableStateFlow<String>("")
     lateinit var scope: CoroutineScope
     override fun init(scope: CoroutineScope) {

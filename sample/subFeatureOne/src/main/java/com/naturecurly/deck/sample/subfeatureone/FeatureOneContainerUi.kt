@@ -33,7 +33,7 @@ import com.naturecurly.deck.compose.DeckComposeContainerUi
 import javax.inject.Inject
 
 @ContainerUi(bindTo = "MainFeature")
-class FeatureOneContainerUi @Inject constructor() : DeckComposeContainerUi<String, FeatureOneDeckContainer>() {
+class FeatureOneContainerUi @Inject constructor() : DeckComposeContainerUi<String, FeatureOneContainer>() {
     override val id: String
         get() = "FeatureOne"
 
