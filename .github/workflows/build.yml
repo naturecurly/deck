@@ -28,6 +28,7 @@ jobs:
       run: ./gradlew build
       
     - name: Publish
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: ./gradlew publish
       env:
         ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
