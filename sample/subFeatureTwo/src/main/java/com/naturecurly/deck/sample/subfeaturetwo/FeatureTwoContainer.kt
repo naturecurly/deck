@@ -38,6 +38,7 @@ class FeatureTwoContainer @Inject constructor() : DeckContainer<String, FeatureT
 
     override fun onDataReady(scope: CoroutineScope, data: String) {
         _uiStateFlow.value = FeatureTwoModel(title = "Feature Two", subtitle = data)
+        // test
     }
 
     private val _uiStateFlow = MutableStateFlow<FeatureTwoModel>(FeatureTwoModel())
