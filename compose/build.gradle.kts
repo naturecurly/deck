@@ -50,7 +50,7 @@ kover {
             excludes {
                 classes(
                     "com.naturecurly.deck.compose.DeckKt",
-                    "com.naturecurly.deck.compose.DeckComposeContainer",
+                    "com.naturecurly.deck.compose.DeckComposeContainerUi",
                     "com.naturecurly.deck.compose.DeckInitializer",
                     "com.naturecurly.deck.compose.DeckScope",
                     "com.naturecurly.deck.compose.DeckScopeImpl",

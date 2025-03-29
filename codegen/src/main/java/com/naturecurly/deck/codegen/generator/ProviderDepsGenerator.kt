@@ -2,8 +2,8 @@ package com.naturecurly.deck.codegen.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.symbol.KSFile
-import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.DeckContainerUi
 import com.naturecurly.deck.codegen.generator.util.deckDependenciesClassName
 import com.naturecurly.deck.codegen.generator.util.deckProviderKClassReturnType
 import com.naturecurly.deck.codegen.generator.util.getDeckQualifierAnnotation
@@ -32,17 +32,17 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
         val deckQualifierAnnotation = getDeckQualifierAnnotation(providerId)
 
         // region Return Type
-        val consumerSetReturnType = Set::class.asClassName().parameterizedBy(
-            DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR).copy(
+        val containerSetReturnType = Set::class.asClassName().parameterizedBy(
+            DeckContainer::class.asClassName().parameterizedBy(STAR, STAR).copy(
                 annotations = listOf(AnnotationSpec.builder(JvmSuppressWildcards::class).build()),
             ),
         )
-        val containerToConsumerPairsReturnType = Set::class.asClassName().parameterizedBy(
+        val containerUiToContainerPairsReturnType = Set::class.asClassName().parameterizedBy(
             Pair::class.asClassName().parameterizedBy(
-                DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
+                DeckContainerUi::class.asClassName().parameterizedBy(STAR, STAR),
                 KClass::class.asClassName().parameterizedBy(
                     WildcardTypeName.producerOf(
-                        DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR),
+                        DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
                     ),
                 ),
             ).copy(
@@ -62,20 +62,20 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
             .returns(deckProviderKClassReturnType)
             .build()
 
-        val functionConsumer = FunSpec.builder("consumers")
+        val functionContainer = FunSpec.builder("containers")
             .addOriginatingKSFile(originatingFile)
             .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
             .addModifiers(KModifier.ABSTRACT)
-            .returns(consumerSetReturnType)
+            .returns(containerSetReturnType)
             .build()
 
-        val functionContainerToConsumerPairs = FunSpec.builder("containerToConsumerPairs")
+        val functionContainerUiToContainerPairs = FunSpec.builder("containerUiToContainerPairs")
             .addOriginatingKSFile(originatingFile)
             .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
             .addModifiers(KModifier.ABSTRACT)
-            .returns(containerToConsumerPairsReturnType)
+            .returns(containerUiToContainerPairsReturnType)
             .build()
         // endregion
 
@@ -90,8 +90,8 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
                 )
                 .addSuperinterface(deckDependenciesClassName)
                 .addFunction(functionProviderClass)
-                .addFunction(functionConsumer)
-                .addFunction(functionContainerToConsumerPairs)
+                .addFunction(functionContainer)
+                .addFunction(functionContainerUiToContainerPairs)
                 .build()
 
         val deckDependenciesInterfaceClassName =

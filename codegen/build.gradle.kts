@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.mavenPublish)
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     implementation(projects.core)
     implementation(libs.kotlinpoet.ksp)

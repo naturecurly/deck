@@ -1,16 +1,15 @@
 package com.naturecurly.deck.sample.subfeatureone
 
-import com.naturecurly.deck.ConsumerEvent
-import com.naturecurly.deck.DeckConsumer
-import com.naturecurly.deck.annotations.Consumer
+import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.annotations.Container
 import com.naturecurly.deck.sample.subfeatureone.Event.UpdateValueEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-@Consumer(bindTo = "MainFeature")
-class FeatureOneDeckConsumer @Inject constructor() : DeckConsumer<String, String>() {
+@Container(bindTo = "MainFeature")
+class FeatureOneDeckContainer @Inject constructor() : DeckContainer<String, String>() {
     private val _uiStateFlow = MutableStateFlow<String>("")
     lateinit var scope: CoroutineScope
     override fun init(scope: CoroutineScope) {
@@ -27,7 +26,6 @@ class FeatureOneDeckConsumer @Inject constructor() : DeckConsumer<String, String
         when (event) {
             UpdateValueEvent -> {
                 _uiStateFlow.value = "Updated FeatureOne"
-                notifyProvider(ConsumerEvent.CustomEvent<String>("custom", "refresh"), scope)
             }
         }
     }

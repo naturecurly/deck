@@ -5,27 +5,27 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 interface DeckProvider<OUTPUT> {
-    private val consumers: Set<DeckConsumer<OUTPUT, *>>
-        get() = WharfLocal.get().getDeckConsumers(System.identityHashCode(this))
-    val containers: Map<String, DeckContainer<*, *>>
+    private val containers: Set<DeckContainer<OUTPUT, *>>
         get() = WharfLocal.get().getDeckContainers(System.identityHashCode(this))
+    val containerUis: Map<String, DeckContainerUi<*, *>>
+        get() = WharfLocal.get().getDeckContainerUis(System.identityHashCode(this))
 
     fun initDeckProvider(scope: CoroutineScope) {
         WharfLocal.get().registerNewProvider<OUTPUT>(this::class, System.identityHashCode(this))
-        consumers.forEach { it.init(scope) }
-        val consumersFlow = merge(*(consumers.map { it.consumerEventFlow }.toTypedArray()))
+        containers.forEach { it.init(scope) }
+        val containersFlow = merge(*(containers.map { it.containerEventFlow }.toTypedArray()))
         scope.launch {
-            consumersFlow.collect {
-                onConsumerEvent(it)
+            containersFlow.collect {
+                onContainerEvent(it)
             }
         }
     }
 
     fun onDeckReady(scope: CoroutineScope, data: OUTPUT) {
-        consumers.forEach { it.onDataReady(scope, data) }
+        containers.forEach { it.onDataReady(scope, data) }
     }
 
-    fun onConsumerEvent(consumerEvent: ConsumerEvent)
+    fun onContainerEvent(containerEvent: ContainerEvent)
 
     fun onDeckClear() {
         WharfLocal.get().clearProvider(System.identityHashCode(this))

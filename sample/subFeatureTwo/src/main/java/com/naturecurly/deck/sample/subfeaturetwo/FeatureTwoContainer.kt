@@ -1,26 +1,28 @@
 package com.naturecurly.deck.sample.subfeaturetwo
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.annotations.Container
-import com.naturecurly.deck.compose.DeckComposeContainer
 import com.naturecurly.deck.sample.subfeaturetwo.model.FeatureTwoModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @Container(bindTo = "MainFeature")
-class FeatureTwoContainer @Inject constructor() : DeckComposeContainer<FeatureTwoModel, FeatureTwoConsumer>() {
-    @Composable
-    override fun Content(modifier: Modifier) {
-        val state by consumer.uiStateFlow.collectAsStateWithLifecycle()
-        Column(modifier) {
-            Text(state.title)
-            Text(state.subtitle)
-        }
+class FeatureTwoContainer @Inject constructor() : DeckContainer<String, FeatureTwoModel>() {
+    override fun init(scope: CoroutineScope) {
+        // DO NOTHING
     }
 
-    override val id: String = "FeatureTwo"
+    override fun onDataReady(scope: CoroutineScope, data: String) {
+        _uiStateFlow.value = FeatureTwoModel(title = "Feature Two", subtitle = data)
+    }
+
+    private val _uiStateFlow = MutableStateFlow<FeatureTwoModel>(FeatureTwoModel())
+
+    override val uiStateFlow: StateFlow<FeatureTwoModel> = _uiStateFlow
+
+    override fun <Any> onEvent(event: Any) {
+        TODO("Not yet implemented")
+    }
 }

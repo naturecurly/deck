@@ -10,14 +10,14 @@ import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
-import com.naturecurly.deck.annotations.Consumer
 import com.naturecurly.deck.annotations.Container
+import com.naturecurly.deck.annotations.ContainerUi
 import com.naturecurly.deck.annotations.Provider
-import com.naturecurly.deck.codegen.generator.ConsumerModuleGenerator
 import com.naturecurly.deck.codegen.generator.ContainerModuleGenerator
+import com.naturecurly.deck.codegen.generator.ContainerUiModuleGenerator
 import com.naturecurly.deck.codegen.generator.ProviderDepsGenerator
 import com.naturecurly.deck.codegen.generator.ProviderModuleGenerator
-import com.naturecurly.deck.codegen.generator.util.deckComposeContainerClassName
+import com.naturecurly.deck.codegen.generator.util.deckComposeContainerUiClassName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ksp.toClassName
 import javax.inject.Inject
@@ -27,8 +27,8 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
     private val logger = environment.logger
     private val providerDepsGenerator by lazy { ProviderDepsGenerator(codeGenerator) }
     private val providerModuleGenerator by lazy { ProviderModuleGenerator(codeGenerator) }
-    private val consumerModuleGenerator by lazy { ConsumerModuleGenerator(codeGenerator) }
-    private val containerModuleGenerator by lazy { ContainerModuleGenerator(codeGenerator, logger) }
+    private val containerModuleGenerator by lazy { ContainerModuleGenerator(codeGenerator) }
+    private val containerUiModuleGenerator by lazy { ContainerUiModuleGenerator(codeGenerator, logger) }
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -72,7 +72,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
 
     @OptIn(KspExperimental::class)
     private fun processConsumers(resolver: Resolver) {
-        val consumers = resolver.getSymbolsWithAnnotation(CONSUMER_CLASS_NAME)
+        val consumers = resolver.getSymbolsWithAnnotation(CONTAINER_CLASS_NAME)
         for (consumer in consumers) {
             if (consumer !is KSDeclaration) {
                 logger.error("@Consumer can't be applied to $consumer")
@@ -84,13 +84,13 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     logger.error("$consumer must be a Class with @Inject constructor()")
                     continue
                 }
-                val bindTo = consumer.getAnnotationsByType(Consumer::class).firstOrNull()?.bindTo
+                val bindTo = consumer.getAnnotationsByType(Container::class).firstOrNull()?.bindTo
                 val destinationPackageName = consumer.packageName.asString() + ".di"
                 bindTo?.let {
-                    consumerModuleGenerator.generate(
+                    containerModuleGenerator.generate(
                         originatingFile = originatingFile,
                         providerId = bindTo,
-                        consumerClassName = consumer.toClassName(),
+                        containerClassName = consumer.toClassName(),
                         destinationPackageName = destinationPackageName,
                     )
                 }
@@ -100,7 +100,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
 
     @OptIn(KspExperimental::class)
     private fun processContainers(resolver: Resolver) {
-        val containers = resolver.getSymbolsWithAnnotation(CONTAINER_CLASS_NAME)
+        val containers = resolver.getSymbolsWithAnnotation(CONTAINER_UI_CLASS_NAME)
         for (container in containers) {
             if (container !is KSDeclaration) {
                 logger.error("@Container can't be applied to $container")
@@ -118,16 +118,16 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                     logger.error("$container does not implement a DeckContainer with a valid DeckConsumer")
                     continue
                 }
-                val providerId = container.getAnnotationsByType(Container::class).firstOrNull()?.bindTo
+                val providerId = container.getAnnotationsByType(ContainerUi::class).firstOrNull()?.bindTo
                 if (providerId.isNullOrBlank()) {
                     logger.error("providerId is not provided.")
                     continue
                 }
-                containerModuleGenerator.generate(
+                containerUiModuleGenerator.generate(
                     originatingFile = originatingFile,
                     providerId = providerId,
-                    containerClassName = container.toClassName(),
-                    consumerClassName = consumerClassName,
+                    containerUiClassName = container.toClassName(),
+                    containerClassName = consumerClassName,
                     destinationPackageName = destinationPackageName,
                 )
             }
@@ -152,7 +152,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
     fun getConsumerFromContainer(container: KSClassDeclaration): ClassName? {
         for (superType in container.superTypes) {
             val ksType = superType.resolve()
-            if (ksType.declaration.qualifiedName?.asString() == deckComposeContainerClassName.canonicalName) {
+            if (ksType.declaration.qualifiedName?.asString() == deckComposeContainerUiClassName.canonicalName) {
                 return (ksType.arguments.getOrNull(1)?.type?.resolve()?.declaration as? KSClassDeclaration)?.toClassName()
             }
         }
@@ -161,7 +161,7 @@ class DeckSymbolProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
 
     private companion object {
         val PROVIDER_CLASS_NAME = Provider::class.qualifiedName!!
-        val CONSUMER_CLASS_NAME = Consumer::class.qualifiedName!!
         val CONTAINER_CLASS_NAME = Container::class.qualifiedName!!
+        val CONTAINER_UI_CLASS_NAME = ContainerUi::class.qualifiedName!!
     }
 }

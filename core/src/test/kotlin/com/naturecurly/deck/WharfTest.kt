@@ -10,54 +10,54 @@ import kotlin.reflect.KClass
 
 class WharfTest {
     @Test
-    fun `verify Wharf getDeckConsumers`() {
-        // Given
-        val providerClass: KClass<out DeckProvider<*>> = mockk()
-        val mockContainerConsumerPairOne = mockContainer("1") to mockConsumer(true)
-        val mockContainerConsumerPairTwo = mockContainer("2") to mockConsumer(false)
-        val wharfImpl = WharfTest(
-            listOf(mockContainerConsumerPairOne, mockContainerConsumerPairTwo),
-        )
-        // When
-        wharfImpl.registerNewProvider<Any>(providerClass, 123)
-        val consumers = wharfImpl.getDeckConsumers<Any>(providerIdentity = 123)
-        // Then
-        assertThat(consumers).isNotEmpty()
-        assertThat(consumers).hasSize(1)
-        assertThat(consumers).contains(mockContainerConsumerPairOne.second)
-    }
-
-    @Test
     fun `verify Wharf getDeckContainers`() {
         // Given
         val providerClass: KClass<out DeckProvider<*>> = mockk()
-        val mockContainerConsumerPairOne = mockContainer("1") to mockConsumer(true)
-        val mockContainerConsumerPairTwo = mockContainer("2") to mockConsumer(false)
+        val mockContainerUiToContainerPairOne = mockContainerUi("1") to mockContainer(true)
+        val mockContainerUiToContainerPairTwo = mockContainerUi("2") to mockContainer(false)
         val wharfImpl = WharfTest(
-            listOf(mockContainerConsumerPairOne, mockContainerConsumerPairTwo),
+            listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
         )
         // When
         wharfImpl.registerNewProvider<Any>(providerClass, 123)
-        val consumers = wharfImpl.getDeckConsumers<Any>(providerIdentity = 123)
-        var containers = wharfImpl.getDeckContainers(123, filterDisabled = false)
+        val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
         // Then
-        assertThat(consumers).isNotEmpty()
-        assertThat(consumers).hasSize(1)
-        assertThat(consumers).contains(mockContainerConsumerPairOne.second)
-        assertThat(containers).hasSize(2)
-        assertThat(containers).containsExactlyEntriesIn(
+        assertThat(containers).isNotEmpty()
+        assertThat(containers).hasSize(1)
+        assertThat(containers).contains(mockContainerUiToContainerPairOne.second)
+    }
+
+    @Test
+    fun `verify Wharf getDeckContainerUis`() {
+        // Given
+        val providerClass: KClass<out DeckProvider<*>> = mockk()
+        val mockContainerUiToContainerPairOne = mockContainerUi("1") to mockContainer(true)
+        val mockContainerUiToContainerPairTwo = mockContainerUi("2") to mockContainer(false)
+        val wharfImpl = WharfTest(
+            listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
+        )
+        // When
+        wharfImpl.registerNewProvider<Any>(providerClass, 123)
+        val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
+        var containerUis = wharfImpl.getDeckContainerUis(123, filterDisabled = false)
+        // Then
+        assertThat(containers).isNotEmpty()
+        assertThat(containers).hasSize(1)
+        assertThat(containers).contains(mockContainerUiToContainerPairOne.second)
+        assertThat(containerUis).hasSize(2)
+        assertThat(containerUis).containsExactlyEntriesIn(
             mapOf(
-                "1" to mockContainerConsumerPairOne.first,
-                "2" to mockContainerConsumerPairTwo.first,
+                "1" to mockContainerUiToContainerPairOne.first,
+                "2" to mockContainerUiToContainerPairTwo.first,
             ),
         )
 
         // When
-        containers = wharfImpl.getDeckContainers(123)
-        assertThat(containers).hasSize(1)
-        assertThat(containers).containsExactlyEntriesIn(
+        containerUis = wharfImpl.getDeckContainerUis(123)
+        assertThat(containerUis).hasSize(1)
+        assertThat(containerUis).containsExactlyEntriesIn(
             mapOf(
-                "1" to mockContainerConsumerPairOne.first,
+                "1" to mockContainerUiToContainerPairOne.first,
             ),
         )
     }
@@ -66,19 +66,19 @@ class WharfTest {
     fun `verify Wharf clearProvider`() {
         // Given
         val providerClass: KClass<out DeckProvider<*>> = mockk()
-        val mockContainerConsumerPairOne = mockContainer("1") to mockConsumer(true)
-        val mockContainerConsumerPairTwo = mockContainer("2") to mockConsumer(false)
+        val mockContainerUiToContainerPairOne = mockContainerUi("1") to mockContainer(true)
+        val mockContainerUiToContainerPairTwo = mockContainerUi("2") to mockContainer(false)
         val wharfImpl = WharfTest(
-            listOf(mockContainerConsumerPairOne, mockContainerConsumerPairTwo),
+            listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
         )
         // When
         wharfImpl.registerNewProvider<Any>(providerClass, 123)
-        val consumers = wharfImpl.getDeckConsumers<Any>(providerIdentity = 123)
+        val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
         wharfImpl.clearProvider(123)
         // Then
-        assertThat(consumers).isNotEmpty()
-        assertThat(wharfImpl.getDeckConsumers<Any>(123)).isEmpty()
-        assertThat(wharfImpl.getDeckContainers(123, filterDisabled = false)).isEmpty()
+        assertThat(containers).isNotEmpty()
+        assertThat(wharfImpl.getDeckContainers<Any>(123)).isEmpty()
+        assertThat(wharfImpl.getDeckContainerUis(123, filterDisabled = false)).isEmpty()
     }
 
     @Test
@@ -90,42 +90,42 @@ class WharfTest {
         assertThat(actual).isEqualTo(wharfImpl)
     }
 
-    class WharfTest(private val consumerContainerPairs: List<Pair<DeckContainer<*, *>, DeckConsumer<*, *>>>) : Wharf() {
+    class WharfTest(private val containerContainerUiPairs: List<Pair<DeckContainerUi<*, *>, DeckContainer<*, *>>>) : Wharf() {
         override fun <INPUT> registerNewProvider(
             providerClass: KClass<out DeckProvider<*>>,
             providerIdentity: Int,
         ) {
             deckEntry.addProvider(providerIdentity)
-            consumerContainerPairs.forEach {
-                val container = it.first
-                val consumer = it.second
-                deckEntry.addConsumer(
-                    providerIdentity = providerIdentity,
-                    consumerClass = consumer::class,
-                    consumer = consumer,
-                )
+            containerContainerUiPairs.forEach {
+                val containerUi = it.first
+                val container = it.second
                 deckEntry.addContainer(
+                    providerIdentity = providerIdentity,
                     containerClass = container::class,
-                    consumerClass = consumer::class,
                     container = container,
                 )
-                deckEntry.getDeckConsumer(container::class)?.let { consumer ->
-                    setConsumerToContainer(container, consumer)
+                deckEntry.addContainerUi(
+                    containerUiClass = containerUi::class,
+                    containerClass = container::class,
+                    containerUi = containerUi,
+                )
+                deckEntry.getDeckContainer(containerUi::class)?.let { container ->
+                    setContainerToContainerUi(containerUi, container)
                 }
             }
         }
     }
 
-    private fun mockContainer(id: String): DeckContainer<*, *> {
-        val container: DeckContainer<*, *> = mockk()
-        every { container.setConsumer(any()) } just runs
+    private fun mockContainerUi(id: String): DeckContainerUi<*, *> {
+        val container: DeckContainerUi<*, *> = mockk()
+        every { container.setContainer(any()) } just runs
         every { container.id } returns id
         return container
     }
 
-    private fun mockConsumer(isEnabled: Boolean = true): DeckConsumer<*, *> {
-        val consumer: DeckConsumer<*, *> = mockk()
-        every { consumer.isEnabled } returns isEnabled
-        return consumer
+    private fun mockContainer(isEnabled: Boolean = true): DeckContainer<*, *> {
+        val container: DeckContainer<*, *> = mockk()
+        every { container.isEnabled } returns isEnabled
+        return container
     }
 }

@@ -3,9 +3,9 @@ package com.naturecurly.deck.compose
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.naturecurly.deck.ConsumerEvent
-import com.naturecurly.deck.DeckConsumer
+import com.naturecurly.deck.ContainerEvent
 import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.DeckContainerUi
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.compose.log.DeckLog
 import dagger.hilt.EntryPoints
@@ -135,11 +135,11 @@ class WharfImplTest {
     }
 
     class DeckProviderTest : DeckProvider<String> {
-        override fun onConsumerEvent(consumerEvent: ConsumerEvent) {
+        override fun onContainerEvent(containerEvent: ContainerEvent) {
         }
     }
 
-    class DeckConsumerTest : DeckConsumer<String, String>() {
+    class DeckContainerTest : DeckContainer<String, String>() {
         override fun init(scope: CoroutineScope) {
         }
 
@@ -153,7 +153,7 @@ class WharfImplTest {
         }
     }
 
-    class DeckContainerTest : DeckContainer<String, DeckConsumerTest>() {
+    class DeckContainerUiTest : DeckContainerUi<String, DeckContainerTest>() {
         override val id: String
             get() = "1"
     }
@@ -161,10 +161,10 @@ class WharfImplTest {
     class DeckDependenciesTest : DeckDependencies {
         override fun providerClass(): KClass<out DeckProvider<*>> = DeckProviderTest::class
 
-        override fun consumers(): Set<@JvmSuppressWildcards DeckConsumer<*, *>> =
-            setOf(DeckConsumerTest())
+        override fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>> =
+            setOf(DeckContainerTest())
 
-        override fun containerToConsumerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainer<*, *>, KClass<out DeckConsumer<*, *>>>> =
-            setOf(DeckContainerTest() to DeckConsumerTest::class)
+        override fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>> =
+            setOf(DeckContainerUiTest() to DeckContainerTest::class)
     }
 }

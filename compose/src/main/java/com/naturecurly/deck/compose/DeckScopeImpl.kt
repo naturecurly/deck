@@ -1,5 +1,5 @@
 package com.naturecurly.deck.compose
 
 class DeckScopeImpl(
-    override val containers: Map<String, DeckComposeContainer<*, *>>,
+    override val containerUis: Map<String, DeckComposeContainerUi<*, *>>,
 ) : DeckScope()

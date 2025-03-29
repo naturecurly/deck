@@ -2,7 +2,7 @@ package com.naturecurly.deck.compose
 
 import android.app.Application
 import android.content.Context
-import com.naturecurly.deck.DeckConsumer
+import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.Wharf
 import com.naturecurly.deck.compose.log.DeckLog
@@ -41,24 +41,24 @@ class WharfImpl : Wharf() {
         entryPoints[providerClass.java]?.let { dep ->
             application?.let { app ->
                 val dependencies = EntryPoints.get(app, dep)
-                val consumers = dependencies.consumers() as Set<DeckConsumer<INPUT, *>>
+                val containers = dependencies.containers() as Set<DeckContainer<INPUT, *>>
                 deckEntry.addProvider(providerIdentity)
-                consumers.forEach {
-                    deckEntry.addConsumer(
+                containers.forEach {
+                    deckEntry.addContainer(
                         providerIdentity = providerIdentity,
-                        consumerClass = it::class,
-                        consumer = it,
+                        containerClass = it::class,
+                        container = it,
                     )
                 }
-                dependencies.containerToConsumerPairs().forEach { containerConsumerPair ->
-                    val container = containerConsumerPair.first
-                    deckEntry.addContainer(
-                        containerClass = container::class,
-                        consumerClass = containerConsumerPair.second,
-                        container = container,
+                dependencies.containerUiToContainerPairs().forEach { uiContainerPair ->
+                    val containerUi = uiContainerPair.first
+                    deckEntry.addContainerUi(
+                        containerUiClass = containerUi::class,
+                        containerClass = uiContainerPair.second,
+                        containerUi = containerUi,
                     )
-                    deckEntry.getDeckConsumer(container::class)?.let { consumer ->
-                        setConsumerToContainer(container, consumer)
+                    deckEntry.getDeckContainer(containerUi::class)?.let { container ->
+                        setContainerToContainerUi(containerUi, container)
                     }
                 }
             }

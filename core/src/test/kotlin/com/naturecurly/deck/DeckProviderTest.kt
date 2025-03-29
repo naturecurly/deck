@@ -1,7 +1,6 @@
 package com.naturecurly.deck
 
 import com.google.common.truth.Truth.assertThat
-import com.naturecurly.deck.ConsumerEvent.RefreshProvider
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -20,35 +19,35 @@ import org.junit.Test
 class DeckProviderTest {
 
     private val wharf: Wharf = mockk()
-    private val mockedConsumer: DeckConsumer<String, *> = mockk()
     private val mockedContainer: DeckContainer<String, *> = mockk()
-    private val mockedConsumerEventFlow: MutableSharedFlow<ConsumerEvent> =
-        MutableSharedFlow<ConsumerEvent>()
+    private val mockedContainerUi: DeckContainerUi<String, *> = mockk()
+    private val mockedContainerEventFlow: MutableSharedFlow<ContainerEvent> =
+        MutableSharedFlow<ContainerEvent>()
 
     @Before
     fun setUp() {
         every { wharf.registerNewProvider<String>(any(), any()) } just runs
-        every { wharf.getDeckConsumers<String>(any()) } returns setOf(mockedConsumer)
-        every { wharf.getDeckContainers(any()) } returns mapOf("1" to mockedContainer)
+        every { wharf.getDeckContainers<String>(any()) } returns setOf(mockedContainer)
+        every { wharf.getDeckContainerUis(any()) } returns mapOf("1" to mockedContainerUi)
         every { wharf.clearProvider(any()) } just runs
-        every { mockedConsumer.init(any()) } just runs
-        every { mockedConsumer.onDataReady(any(), any()) } just runs
-        every { mockedConsumer.consumerEventFlow } returns mockedConsumerEventFlow
+        every { mockedContainer.init(any()) } just runs
+        every { mockedContainer.onDataReady(any(), any()) } just runs
+        every { mockedContainer.containerEventFlow } returns mockedContainerEventFlow
         WharfLocal.init(wharf)
     }
 
     @Test
     fun `verify initDeckProvider`() = runTest {
         // When
-        val events = mutableListOf<ConsumerEvent>()
+        val events = mutableListOf<ContainerEvent>()
         val provider = getDeckProvider(events)
         val testScope =
             CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher())
         provider.initDeckProvider(testScope)
-        mockedConsumerEventFlow.emit(RefreshProvider)
+        mockedContainerEventFlow.emit(RefreshProvider)
         // Then
         verify { wharf.registerNewProvider<String>(provider::class, any()) }
-        verify { mockedConsumer.init(testScope) }
+        verify { mockedContainer.init(testScope) }
         assertThat(events.first()).isEqualTo(RefreshProvider)
     }
 
@@ -56,9 +55,9 @@ class DeckProviderTest {
     fun `verify accessing containers`() {
         // When
         val provider = getDeckProvider()
-        val containers = provider.containers
+        val containers = provider.containerUis
         // Then
-        assertThat(containers).isEqualTo(mapOf("1" to mockedContainer))
+        assertThat(containers).isEqualTo(mapOf("1" to mockedContainerUi))
     }
 
     @Test
@@ -70,8 +69,8 @@ class DeckProviderTest {
         provider.onDeckReady(testScope, "test")
         // Then
         verify { wharf.registerNewProvider<String>(provider::class, any()) }
-        verify { mockedConsumer.init(testScope) }
-        verify { mockedConsumer.onDataReady(testScope, "test") }
+        verify { mockedContainer.init(testScope) }
+        verify { mockedContainer.onDataReady(testScope, "test") }
     }
 
     @Test
@@ -83,10 +82,10 @@ class DeckProviderTest {
         verify { wharf.clearProvider(any()) }
     }
 
-    private fun getDeckProvider(eventList: MutableList<ConsumerEvent> = mutableListOf()): DeckProvider<String> {
+    private fun getDeckProvider(eventList: MutableList<ContainerEvent> = mutableListOf()): DeckProvider<String> {
         val provider = object : DeckProvider<String> {
-            override fun onConsumerEvent(consumerEvent: ConsumerEvent) {
-                eventList.add(consumerEvent)
+            override fun onContainerEvent(containerEvent: ContainerEvent) {
+                eventList.add(containerEvent)
             }
         }
         return provider

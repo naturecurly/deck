@@ -10,13 +10,13 @@ import kotlinx.collections.immutable.toImmutableMap
 @Composable
 fun Deck(provider: DeckProvider<*>, content: @Composable DeckScope.() -> Unit) {
     rememberDeckScope(
-        provider.containers.filterValues { it is DeckComposeContainer<*, *> }
-            .mapValues { it.value as DeckComposeContainer }.toImmutableMap(),
+        provider.containerUis.filterValues { it is DeckComposeContainerUi<*, *> }
+            .mapValues { it.value as DeckComposeContainerUi }.toImmutableMap(),
     ).apply { content() }
 }
 
 @Composable
-private fun rememberDeckScope(containers: ImmutableMap<String, DeckComposeContainer<*, *>>) =
+private fun rememberDeckScope(containers: ImmutableMap<String, DeckComposeContainerUi<*, *>>) =
     remember(containers) {
         DeckScopeImpl(containers)
     }

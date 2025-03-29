@@ -1,7 +1,7 @@
 package com.naturecurly.deck.codegen.generator.util
 
-import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.DeckContainerUi
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.annotations.DeckQualifier
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -23,17 +23,17 @@ internal val deckProviderKClassReturnType =
         ),
     )
 
-internal val deckConsumerKClassReturnType =
+internal val deckContainerKClassReturnType =
     KClass::class.asClassName().parameterizedBy(
         WildcardTypeName.producerOf(
-            DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR),
+            DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
         ),
     )
 
-internal val deckConsumerReturnType = DeckConsumer::class.asClassName().parameterizedBy(STAR, STAR)
+internal val deckContainerReturnType = DeckContainer::class.asClassName().parameterizedBy(STAR, STAR)
 
-// Pair<DeckContainer<*, *>, KClass<out DeckConsumer<*, *>>>
-internal val deckContainerConsumerPairReturnType = Pair::class.asClassName().parameterizedBy(
-    DeckContainer::class.asClassName().parameterizedBy(STAR, STAR),
-    deckConsumerKClassReturnType,
+// Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>
+internal val deckContainerUiContainerPairReturnType = Pair::class.asClassName().parameterizedBy(
+    DeckContainerUi::class.asClassName().parameterizedBy(STAR, STAR),
+    deckContainerKClassReturnType,
 )

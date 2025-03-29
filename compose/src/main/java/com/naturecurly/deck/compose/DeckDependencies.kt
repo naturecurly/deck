@@ -1,7 +1,7 @@
 package com.naturecurly.deck.compose
 
-import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.DeckContainerUi
 import com.naturecurly.deck.DeckProvider
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -16,6 +16,6 @@ interface DeckDependenciesEntryPoint {
 
 interface DeckDependencies {
     fun providerClass(): KClass<out DeckProvider<*>>
-    fun consumers(): Set<@JvmSuppressWildcards DeckConsumer<*, *>>
-    fun containerToConsumerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainer<*, *>, KClass<out DeckConsumer<*, *>>>>
+    fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>>
+    fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>>
 }

@@ -9,12 +9,12 @@ import com.naturecurly.deck.compose.log.DeckLog
 
 @Immutable
 abstract class DeckScope {
-    protected abstract val containers: Map<String, DeckComposeContainer<*, *>>
+    protected abstract val containerUis: Map<String, DeckComposeContainerUi<*, *>>
 
     @SuppressLint("RememberReturnType")
     @Composable
     fun Stub(containerId: String, modifier: Modifier = Modifier) {
-        containers[containerId]?.Content(modifier) ?: remember(containerId) {
+        containerUis[containerId]?.Content(modifier) ?: remember(containerId) {
             DeckLog.w("Not found containerId: $containerId")
         }
     }

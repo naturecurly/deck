@@ -9,27 +9,27 @@ abstract class Wharf : ProviderRegister {
         WharfLocal.init(this)
     }
 
-    internal fun <INPUT> getDeckConsumers(
+    internal fun <INPUT> getDeckContainers(
         providerIdentity: Int,
-    ): Set<DeckConsumer<INPUT, *>> {
+    ): Set<DeckContainer<INPUT, *>> {
         @Suppress("UNCHECKED_CAST")
-        return deckEntry.getDeckConsumers(providerIdentity).filter { it.isEnabled }
-            .toSet() as Set<DeckConsumer<INPUT, *>>
+        return deckEntry.getDeckContainers(providerIdentity).filter { it.isEnabled }
+            .toSet() as Set<DeckContainer<INPUT, *>>
     }
 
-    internal fun getDeckContainers(
+    internal fun getDeckContainerUis(
         providerIdentity: Int,
         filterDisabled: Boolean = true,
-    ): Map<String, DeckContainer<*, *>> {
-        return deckEntry.getContainersByProvider(providerIdentity, filterDisabled)
+    ): Map<String, DeckContainerUi<*, *>> {
+        return deckEntry.getContainerUisByProvider(providerIdentity, filterDisabled)
             .associate { it.id to it }
     }
 
-    protected fun setConsumerToContainer(
+    protected fun setContainerToContainerUi(
+        containerUi: DeckContainerUi<*, *>,
         container: DeckContainer<*, *>,
-        consumer: DeckConsumer<*, *>,
     ) {
-        container.setConsumer(consumer)
+        containerUi.setContainer(container)
     }
 
     internal fun clearProvider(providerIdentity: Int) {

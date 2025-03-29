@@ -1,83 +1,83 @@
 package com.naturecurly.deck.model
 
-import com.naturecurly.deck.DeckConsumer
 import com.naturecurly.deck.DeckContainer
+import com.naturecurly.deck.DeckContainerUi
 import kotlin.reflect.KClass
 
 class DeckEntry {
     private val providers = mutableMapOf<Int, ProviderEntry>()
-    private val consumers = mutableMapOf<KClass<out DeckConsumer<*, *>>, ConsumerEntry>()
     private val containers = mutableMapOf<KClass<out DeckContainer<*, *>>, ContainerEntry>()
+    private val containerUis = mutableMapOf<KClass<out DeckContainerUi<*, *>>, ContainerUiEntry>()
 
     fun addProvider(providerIdentity: Int) {
         providers[providerIdentity] = ProviderEntry(providerIdentity)
     }
 
-    fun addConsumer(
-        providerIdentity: Int,
-        consumerClass: KClass<out DeckConsumer<*, *>>,
-        consumer: DeckConsumer<*, *>,
-    ) {
-        val consumerEntry = ConsumerEntry(consumerClass, consumer)
-        providers[providerIdentity]?.let { provider ->
-            provider.addConsumer(consumerEntry)
-            consumers[consumerClass] = consumerEntry
-        }
-    }
-
     fun addContainer(
+        providerIdentity: Int,
         containerClass: KClass<out DeckContainer<*, *>>,
-        consumerClass: KClass<out DeckConsumer<*, *>>,
         container: DeckContainer<*, *>,
     ) {
-        consumers[consumerClass]?.let { consumer ->
-            val containerEntry = ContainerEntry(containerClass, container, consumer)
+        val containerEntry = ContainerEntry(containerClass, container)
+        providers[providerIdentity]?.let { provider ->
+            provider.addContainer(containerEntry)
             containers[containerClass] = containerEntry
         }
     }
 
+    fun addContainerUi(
+        containerUiClass: KClass<out DeckContainerUi<*, *>>,
+        containerClass: KClass<out DeckContainer<*, *>>,
+        containerUi: DeckContainerUi<*, *>,
+    ) {
+        containers[containerClass]?.let { container ->
+            val containerUiEntry = ContainerUiEntry(containerUiClass, containerUi, container)
+            containerUis[containerUiClass] = containerUiEntry
+        }
+    }
+
     internal fun clearProvider(providerIdentity: Int) {
-        val consumersToBeCleared = providers.remove(providerIdentity)?.clear()
-        consumersToBeCleared?.forEach { consumer ->
-            val containersToBeCleared = consumers.remove(consumer)?.clear()
+        val containersToBeCleared = providers.remove(providerIdentity)?.clear()
+        containersToBeCleared?.forEach { container ->
+            val containersToBeCleared = containers.remove(container)?.clear()
             containersToBeCleared?.forEach { container ->
-                containers.remove(container)
+                containerUis.remove(container)
             }
         }
     }
 
     fun clear() {
         providers.clear()
-        consumers.clear()
         containers.clear()
+        containerUis.clear()
     }
 
     internal fun containsProvider(providerIdentity: Int): Boolean {
         return providers.contains(providerIdentity)
     }
 
-    internal fun getDeckConsumers(providerIdentity: Int): Set<DeckConsumer<*, *>> {
-        return providers[providerIdentity]?.consumers?.map { it.consumer }?.toSet() ?: emptySet()
+    internal fun getDeckContainers(providerIdentity: Int): Set<DeckContainer<*, *>> {
+        return providers[providerIdentity]?.containers?.map { it.container }?.toSet() ?: emptySet()
     }
 
-    fun getDeckConsumer(containerClass: KClass<out DeckContainer<*, *>>): DeckConsumer<*, *>? {
-        return containers[containerClass]?.consumer?.consumer
+    fun getDeckContainer(containerClass: KClass<out DeckContainerUi<*, *>>): DeckContainer<*, *>? {
+        return containerUis[containerClass]?.container?.container
     }
 
-    internal fun getContainersByProvider(
+    internal fun getContainerUisByProvider(
         providerIdentity: Int,
         filterDisabled: Boolean,
-    ): Set<DeckContainer<*, *>> {
-        return providers[providerIdentity]?.consumers
+    ): Set<DeckContainerUi<*, *>> {
+        return providers[providerIdentity]?.containers
             ?.run {
                 if (filterDisabled) {
-                    filter { it.consumer.isEnabled }
+                    filter { it.container.isEnabled }
                 } else {
                     this
                 }
             }
-            ?.flatMap { it.containers }
-            ?.map { it.container }
+            ?.flatMap { it.containerUis }
+            ?.map { it.containerUi }
             ?.toSet() ?: emptySet()
     }
 }
