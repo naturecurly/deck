@@ -6,6 +6,10 @@ Deck
 
 Deck is a pluggable UI framework for Android Jetpack Compose. It addresses the common challenge of integrating multiple sub-functionalities into a primary feature without creating direct dependencies.
 
+The **Deck** represents a platform feature, like the deck of a ship, providing a stable platform where various components can be added or removed as needed. Each functionality or feature is represented by a **Container**, which acts like a shipping container on the deck, holding a specific piece of functionality or module.
+
+This framework ensures that you can easily extend, swap out, or remove containers without disrupting the overall structure of the application. Think of it like a ship where the deck is your main platform, and containers are the different modules you can load onto it, creating a dynamic and adaptable system.
+
 _Note: This framework requires use of [KSP](https://github.com/google/ksp) and [Hilt](https://github.com/google/dagger) in your project_
 
 What is the problem?
