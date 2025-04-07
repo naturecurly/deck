@@ -20,16 +20,17 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.compose
+package com.naturecurly.deck
 
-import android.content.Context
-import androidx.startup.Initializer
+import kotlin.reflect.KClass
 
-class DeckInitializer : Initializer<WharfImpl> {
-    override fun create(context: Context): WharfImpl =
-        WharfImpl().apply {
-            init(context)
-        }
+interface WharfAccess {
+    fun <INPUT> registerNewProvider(
+        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
+    )
 
-    override fun dependencies(): List<Class<out Initializer<*>?>?> = emptyList()
+    fun <INPUT> getDeckContainers(providerIdentity: Int): Set<DeckContainer<INPUT, *>>
+    fun getDeckContainerUis(providerIdentity: Int): Map<String, DeckContainerUi<*, *>>
+    fun clearProvider(providerIdentity: Int)
 }

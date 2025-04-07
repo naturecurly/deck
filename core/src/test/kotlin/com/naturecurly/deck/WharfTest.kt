@@ -103,15 +103,6 @@ class WharfTest {
         assertThat(wharfImpl.getDeckContainerUis(123, filterDisabled = false)).isEmpty()
     }
 
-    @Test
-    fun `verify WharfLocal`() {
-        // Given
-        val wharfImpl = WharfTest(listOf())
-        val actual = WharfLocal.get()
-        // Then
-        assertThat(actual).isEqualTo(wharfImpl)
-    }
-
     class WharfTest(private val containerContainerUiPairs: List<Pair<DeckContainerUi<*, *>, DeckContainer<*, *>>>) : Wharf() {
         override fun <INPUT> registerNewProvider(
             providerClass: KClass<out DeckProvider<*>>,

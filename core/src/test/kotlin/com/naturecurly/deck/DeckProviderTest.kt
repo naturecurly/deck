@@ -55,7 +55,6 @@ class DeckProviderTest {
         every { mockedContainer.init(any()) } just runs
         every { mockedContainer.onDataReady(any(), any()) } just runs
         every { mockedContainer.containerEventFlow } returns mockedContainerEventFlow
-        WharfLocal.init(wharf)
     }
 
     @Test
@@ -105,7 +104,8 @@ class DeckProviderTest {
     }
 
     private fun getDeckProvider(eventList: MutableList<ContainerEvent> = mutableListOf()): DeckProvider<String> {
-        val provider = object : DeckProvider<String> {
+        val mockedWharfAccess: WharfAccess = mockk()
+        val provider = object : DeckProvider<String>, WharfAccess by mockedWharfAccess {
             override fun onContainerEvent(containerEvent: ContainerEvent) {
                 eventList.add(containerEvent)
             }

@@ -51,7 +51,6 @@ kover {
                 classes(
                     "com.naturecurly.deck.compose.DeckKt",
                     "com.naturecurly.deck.compose.DeckComposeContainerUi",
-                    "com.naturecurly.deck.compose.DeckInitializer",
                     "com.naturecurly.deck.compose.DeckScope",
                     "com.naturecurly.deck.compose.DeckScopeImpl",
                 )
@@ -69,7 +68,6 @@ kover {
 dependencies {
     api(projects.core)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)

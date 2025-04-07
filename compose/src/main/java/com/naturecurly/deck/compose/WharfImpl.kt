@@ -23,7 +23,6 @@
 package com.naturecurly.deck.compose
 
 import android.app.Application
-import android.content.Context
 import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.Wharf
@@ -37,22 +36,18 @@ class WharfImpl : Wharf() {
     // synchronizedMap is used to make the map thread-safe?
     private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
 
-    internal fun init(context: Context) {
+    internal fun init(app: Application) {
         entryPoints.clear()
         deckEntry.clear()
         runCatching {
             entryPoints.putAll(
-                EntryPoints.get(context, DeckDependenciesEntryPoint::class.java).dependencies(),
+                EntryPoints.get(app, DeckDependenciesEntryPoint::class.java).dependencies(),
             )
         }.onFailure {
             DeckLog.e("WharfImpl initialization failed", it)
             return
         }
-        if (context is Application) {
-            application = context
-        } else {
-            DeckLog.w("Context is not an instance of Application")
-        }
+        application = app
     }
 
     @Suppress("UNCHECKED_CAST")

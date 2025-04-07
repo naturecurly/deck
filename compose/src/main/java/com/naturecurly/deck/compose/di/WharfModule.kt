@@ -20,38 +20,29 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.sample.feature1
+package com.naturecurly.deck.compose.di
 
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.naturecurly.deck.ContainerEvent
-import com.naturecurly.deck.DeckProvider
-import com.naturecurly.deck.RefreshProvider
+import android.app.Application
+import com.naturecurly.deck.Wharf
 import com.naturecurly.deck.WharfAccess
-import com.naturecurly.deck.annotations.Provider
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import com.naturecurly.deck.WharfAccessImpl
+import com.naturecurly.deck.compose.WharfImpl
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-@HiltViewModel
-@Provider("MainFeature")
-class MainViewModel @Inject constructor(private val wharfAccess: WharfAccess) :
-    ViewModel(),
-    DeckProvider<String>,
-    WharfAccess by wharfAccess {
-    init {
-        initDeckProvider(viewModelScope)
-        onDeckReady(viewModelScope, "Hello, World!")
+@Module
+@InstallIn(SingletonComponent::class)
+class WharfModule {
+    @Provides
+    @Singleton
+    fun provideWharf(app: Application): Wharf = WharfImpl().apply {
+        init(app)
     }
 
-    override fun onContainerEvent(containerEvent: ContainerEvent) {
-        when (containerEvent) {
-            RefreshProvider -> Log.d("MainViewModel", "Refresh Provider")
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        onDeckClear()
-    }
+    @Provides
+    @Singleton
+    fun provideWharfAccess(wharf: Wharf): WharfAccess = WharfAccessImpl(wharf)
 }

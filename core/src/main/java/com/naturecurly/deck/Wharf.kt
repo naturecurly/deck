@@ -27,10 +27,6 @@ import com.naturecurly.deck.model.DeckEntry
 abstract class Wharf : ProviderRegister {
     protected val deckEntry = DeckEntry()
 
-    init {
-        WharfLocal.init(this)
-    }
-
     internal fun <INPUT> getDeckContainers(
         providerIdentity: Int,
     ): Set<DeckContainer<INPUT, *>> {

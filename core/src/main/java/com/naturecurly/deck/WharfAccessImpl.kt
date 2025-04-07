@@ -22,11 +22,25 @@
 
 package com.naturecurly.deck
 
-internal object WharfLocal {
-    private lateinit var wharf: Wharf
-    internal fun init(wharf: Wharf) {
-        this.wharf = wharf
+import kotlin.reflect.KClass
+
+class WharfAccessImpl(private val wharf: Wharf) : WharfAccess {
+    override fun <INPUT> getDeckContainers(providerIdentity: Int): Set<DeckContainer<INPUT, *>> {
+        return wharf.getDeckContainers<INPUT>(providerIdentity)
     }
 
-    internal fun get() = wharf
+    override fun getDeckContainerUis(providerIdentity: Int): Map<String, DeckContainerUi<*, *>> {
+        return wharf.getDeckContainerUis(providerIdentity)
+    }
+
+    override fun clearProvider(providerIdentity: Int) {
+        return wharf.clearProvider(providerIdentity)
+    }
+
+    override fun <INPUT> registerNewProvider(
+        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
+    ) {
+        wharf.registerNewProvider<INPUT>(providerClass, providerIdentity)
+    }
 }
