@@ -23,12 +23,14 @@
 package com.naturecurly.deck.compose
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import com.naturecurly.deck.ContainerEvent
 import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.DeckContainerUi
 import com.naturecurly.deck.DeckProvider
+import com.naturecurly.deck.Wharf
+import com.naturecurly.deck.WharfAccess
+import com.naturecurly.deck.WharfAccessImpl
 import com.naturecurly.deck.compose.log.DeckLog
 import dagger.hilt.EntryPoints
 import io.mockk.every
@@ -93,30 +95,6 @@ class WharfImplTest {
     }
 
     @Test
-    fun `verify WharfImpl with non Application context`() {
-        // Given
-        val mockedContext: Context = mockk(relaxed = true)
-        val entryPoints: DeckDependenciesEntryPoint = object : DeckDependenciesEntryPoint {
-            override fun dependencies(): Map<Class<*>, @JvmSuppressWildcards Class<out DeckDependencies>> {
-                return mapOf()
-            }
-        }
-        mockkStatic(EntryPoints::class)
-        every {
-            EntryPoints.get(
-                mockedContext,
-                DeckDependenciesEntryPoint::class.java,
-            )
-        } returns entryPoints
-        // When
-        val wharf = WharfImpl()
-        wharf.init(mockedContext)
-        // Then
-        verify(exactly = 0) { DeckLog.e(any(), any()) }
-        verify { DeckLog.w(any()) }
-    }
-
-    @Test
     fun `verify WharfImpl registerNewProvider`() {
         // Given
         val mockedContext: Application = mockk(relaxed = true)
@@ -142,7 +120,7 @@ class WharfImplTest {
         // When
         val wharf = WharfImpl()
         wharf.init(mockedContext)
-        wharf.registerNewProvider<String>(DeckProviderTest::class, 123)
+        wharf.registerNewProvider(DeckProviderTest::class, 123)
         // Then
         verify(exactly = 0) { DeckLog.e(any(), any()) }
         verify(exactly = 0) { DeckLog.w(any()) }
@@ -153,10 +131,12 @@ class WharfImplTest {
         // Given
         // When
         val wharf = WharfImpl()
-        wharf.registerNewProvider<String>(DeckProviderTest::class, 123)
+        wharf.registerNewProvider(DeckProviderTest::class, 123)
     }
 
-    class DeckProviderTest : DeckProvider<String> {
+    class DeckProviderTest(wharf: Wharf) :
+        DeckProvider<String>,
+        WharfAccess by WharfAccessImpl(wharf) {
         override fun onContainerEvent(containerEvent: ContainerEvent) {
         }
     }

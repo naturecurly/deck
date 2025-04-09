@@ -20,13 +20,29 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck
+package com.naturecurly.deck.compose.di
 
-internal object WharfLocal {
-    private lateinit var wharf: Wharf
-    internal fun init(wharf: Wharf) {
-        this.wharf = wharf
+import android.app.Application
+import com.naturecurly.deck.Wharf
+import com.naturecurly.deck.WharfAccess
+import com.naturecurly.deck.WharfAccessImpl
+import com.naturecurly.deck.compose.WharfImpl
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+class WharfModule {
+    @Provides
+    @Singleton
+    fun provideWharf(app: Application): Wharf = WharfImpl().apply {
+        init(app)
     }
 
-    internal fun get() = wharf
+    @Provides
+    @Singleton
+    fun provideWharfAccess(wharf: Wharf): WharfAccess = WharfAccessImpl(wharf)
 }

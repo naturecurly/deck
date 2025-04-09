@@ -28,15 +28,17 @@ import androidx.lifecycle.viewModelScope
 import com.naturecurly.deck.ContainerEvent
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.RefreshProvider
+import com.naturecurly.deck.WharfAccess
 import com.naturecurly.deck.annotations.Provider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 @Provider("MainFeature")
-class MainViewModel @Inject constructor() :
+class MainViewModel @Inject constructor(private val wharfAccess: WharfAccess) :
     ViewModel(),
-    DeckProvider<String> {
+    DeckProvider<String>,
+    WharfAccess by wharfAccess {
     init {
         initDeckProvider(viewModelScope)
         onDeckReady(viewModelScope, "Hello, World!")

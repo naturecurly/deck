@@ -24,9 +24,23 @@ package com.naturecurly.deck
 
 import kotlin.reflect.KClass
 
-interface ProviderRegister {
-    fun <INPUT> registerNewProvider(
+class WharfAccessImpl(private val wharf: Wharf) : WharfAccess {
+    override fun <INPUT> getDeckContainers(providerIdentity: Int): Set<DeckContainer<INPUT, *>> {
+        return wharf.getDeckContainers<INPUT>(providerIdentity)
+    }
+
+    override fun getDeckContainerUis(providerIdentity: Int): Map<String, DeckContainerUi<*, *>> {
+        return wharf.getDeckContainerUis(providerIdentity)
+    }
+
+    override fun clearProvider(providerIdentity: Int) {
+        return wharf.clearProvider(providerIdentity)
+    }
+
+    override fun <INPUT> registerNewProvider(
         providerClass: KClass<out DeckProvider<*>>,
         providerIdentity: Int,
-    )
+    ) {
+        wharf.registerNewProvider(providerClass, providerIdentity)
+    }
 }

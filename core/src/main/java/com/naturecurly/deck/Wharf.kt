@@ -23,13 +23,10 @@
 package com.naturecurly.deck
 
 import com.naturecurly.deck.model.DeckEntry
+import kotlin.reflect.KClass
 
-abstract class Wharf : ProviderRegister {
+abstract class Wharf {
     protected val deckEntry = DeckEntry()
-
-    init {
-        WharfLocal.init(this)
-    }
 
     internal fun <INPUT> getDeckContainers(
         providerIdentity: Int,
@@ -57,4 +54,9 @@ abstract class Wharf : ProviderRegister {
     internal fun clearProvider(providerIdentity: Int) {
         deckEntry.clearProvider(providerIdentity)
     }
+
+    abstract fun registerNewProvider(
+        providerClass: KClass<out DeckProvider<*>>,
+        providerIdentity: Int,
+    )
 }
