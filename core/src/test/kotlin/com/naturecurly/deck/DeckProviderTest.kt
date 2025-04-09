@@ -48,7 +48,7 @@ class DeckProviderTest {
 
     @Before
     fun setUp() {
-        every { wharf.registerNewProvider<String>(any(), any()) } just runs
+        every { wharf.registerNewProvider(any(), any()) } just runs
         every { wharf.getDeckContainers<String>(any()) } returns setOf(mockedContainer)
         every { wharf.getDeckContainerUis(any()) } returns mapOf("1" to mockedContainerUi)
         every { wharf.clearProvider(any()) } just runs
@@ -67,7 +67,7 @@ class DeckProviderTest {
         provider.initDeckProvider(testScope)
         mockedContainerEventFlow.emit(RefreshProvider)
         // Then
-        verify { wharf.registerNewProvider<String>(provider::class, any()) }
+        verify { wharf.registerNewProvider(provider::class, any()) }
         verify { mockedContainer.init(testScope) }
         assertThat(events.first()).isEqualTo(RefreshProvider)
     }
@@ -89,7 +89,7 @@ class DeckProviderTest {
         provider.initDeckProvider(testScope)
         provider.onDeckReady(testScope, "test")
         // Then
-        verify { wharf.registerNewProvider<String>(provider::class, any()) }
+        verify { wharf.registerNewProvider(provider::class, any()) }
         verify { mockedContainer.init(testScope) }
         verify { mockedContainer.onDataReady(testScope, "test") }
     }
@@ -104,7 +104,7 @@ class DeckProviderTest {
     }
 
     private fun getDeckProvider(eventList: MutableList<ContainerEvent> = mutableListOf()): DeckProvider<String> {
-        val mockedWharfAccess: WharfAccess = mockk()
+        val mockedWharfAccess: WharfAccess = WharfAccessImpl(wharf)
         val provider = object : DeckProvider<String>, WharfAccess by mockedWharfAccess {
             override fun onContainerEvent(containerEvent: ContainerEvent) {
                 eventList.add(containerEvent)

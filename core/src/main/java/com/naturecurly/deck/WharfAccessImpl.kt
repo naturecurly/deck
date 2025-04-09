@@ -41,6 +41,6 @@ class WharfAccessImpl(private val wharf: Wharf) : WharfAccess {
         providerClass: KClass<out DeckProvider<*>>,
         providerIdentity: Int,
     ) {
-        wharf.registerNewProvider<INPUT>(providerClass, providerIdentity)
+        wharf.registerNewProvider(providerClass, providerIdentity)
     }
 }

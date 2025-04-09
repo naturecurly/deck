@@ -41,7 +41,7 @@ class WharfTest {
             listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
         )
         // When
-        wharfImpl.registerNewProvider<Any>(providerClass, 123)
+        wharfImpl.registerNewProvider(providerClass, 123)
         val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
         // Then
         assertThat(containers).isNotEmpty()
@@ -59,7 +59,7 @@ class WharfTest {
             listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
         )
         // When
-        wharfImpl.registerNewProvider<Any>(providerClass, 123)
+        wharfImpl.registerNewProvider(providerClass, 123)
         val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
         var containerUis = wharfImpl.getDeckContainerUis(123, filterDisabled = false)
         // Then
@@ -94,7 +94,7 @@ class WharfTest {
             listOf(mockContainerUiToContainerPairOne, mockContainerUiToContainerPairTwo),
         )
         // When
-        wharfImpl.registerNewProvider<Any>(providerClass, 123)
+        wharfImpl.registerNewProvider(providerClass, 123)
         val containers = wharfImpl.getDeckContainers<Any>(providerIdentity = 123)
         wharfImpl.clearProvider(123)
         // Then
@@ -104,7 +104,7 @@ class WharfTest {
     }
 
     class WharfTest(private val containerContainerUiPairs: List<Pair<DeckContainerUi<*, *>, DeckContainer<*, *>>>) : Wharf() {
-        override fun <INPUT> registerNewProvider(
+        override fun registerNewProvider(
             providerClass: KClass<out DeckProvider<*>>,
             providerIdentity: Int,
         ) {

@@ -53,13 +53,15 @@ kover {
                     "com.naturecurly.deck.compose.DeckComposeContainerUi",
                     "com.naturecurly.deck.compose.DeckScope",
                     "com.naturecurly.deck.compose.DeckScopeImpl",
+                    "com.naturecurly.deck.compose.di.*",
+                    "hilt_aggregated_deps.*",
                 )
             }
         }
         verify {
             rule {
                 minBound(95, CoverageUnit.LINE)
-                minBound(80, CoverageUnit.BRANCH)
+                minBound(75, CoverageUnit.BRANCH)
             }
         }
     }

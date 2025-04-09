@@ -23,7 +23,6 @@
 package com.naturecurly.deck.compose
 
 import android.app.Application
-import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.Wharf
 import com.naturecurly.deck.compose.log.DeckLog
@@ -33,7 +32,6 @@ import kotlin.reflect.KClass
 class WharfImpl : Wharf() {
     private var application: Application? = null
 
-    // synchronizedMap is used to make the map thread-safe?
     private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
 
     internal fun init(app: Application) {
@@ -51,14 +49,14 @@ class WharfImpl : Wharf() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <INPUT> registerNewProvider(
+    override fun registerNewProvider(
         providerClass: KClass<out DeckProvider<*>>,
         providerIdentity: Int,
     ) {
         entryPoints[providerClass.java]?.let { dep ->
             application?.let { app ->
                 val dependencies = EntryPoints.get(app, dep)
-                val containers = dependencies.containers() as Set<DeckContainer<INPUT, *>>
+                val containers = dependencies.containers()
                 deckEntry.addProvider(providerIdentity)
                 containers.forEach {
                     deckEntry.addContainer(
