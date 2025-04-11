@@ -40,7 +40,7 @@ fun Deck(provider: DeckProvider<*>, content: @Composable DeckScope.() -> Unit) {
 @Composable
 private fun rememberDeckScope(containers: ImmutableMap<String, DeckComposeContainerUi<*, *>>) =
     remember(containers) {
-        DeckScopeImpl(containers)
+        DeckScope(containers)
     }
 
 @Composable

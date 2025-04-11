@@ -71,6 +71,7 @@ dependencies {
     api(projects.core)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.collections.immutable)
