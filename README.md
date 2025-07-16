@@ -51,8 +51,8 @@ Getting Started
 
 Download [the latest JAR](https://repo1.maven.org/maven2/com/naturecurly/deck/deck-compose/0.1.0/deck-compose-0.1.0.aar) or depend via Gradle:
 ```kotlin
-implementation("com.naturecurly.deck:deck-compose:0.6.0")
-ksp("com.naturecurly.deck:deck-codegen:0.6.0")
+implementation("com.naturecurly.deck:deck-compose:0.7.0")
+ksp("com.naturecurly.deck:deck-codegen:0.7.0")
 ```
 
 Usage
