@@ -67,7 +67,7 @@ class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> { 
 2. Mark the class (e.g., ViewModel, Presenter) with the @Provider annotation. The annotation parameter should be the ID of the main feature, allowing subfeatures to bind to the primary feature. For example, when the id is `MainFeature`:
 ```kotlin
 @Provider("MainFeature")
-class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
+class MainViewModel @Inject constructor(wharfAccess: WharfAccess) : ViewModel(), DeckProvider<String>, WharfAccess by wharfAccess {
     // ViewModel logic here
 }
 ```

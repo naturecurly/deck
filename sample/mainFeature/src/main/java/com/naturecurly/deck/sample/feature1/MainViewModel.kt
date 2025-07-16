@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 @Provider("MainFeature")
-class MainViewModel @Inject constructor(private val wharfAccess: WharfAccess) :
+class MainViewModel @Inject constructor(wharfAccess: WharfAccess) :
     ViewModel(),
     DeckProvider<String>,
     WharfAccess by wharfAccess {
