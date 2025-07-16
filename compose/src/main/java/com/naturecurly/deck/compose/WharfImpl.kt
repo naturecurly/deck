@@ -30,9 +30,7 @@ import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
 class WharfImpl : Wharf() {
-    private var application: Application? = null
-
-    private val entryPoints: MutableMap<Class<*>, Class<out DeckDependencies>> = mutableMapOf()
+    private val entryPoints: MutableMap<Class<*>, DeckDependencies> = mutableMapOf()
 
     internal fun init(app: Application) {
         entryPoints.clear()
@@ -45,7 +43,6 @@ class WharfImpl : Wharf() {
             DeckLog.e("WharfImpl initialization failed", it)
             return
         }
-        application = app
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -53,28 +50,25 @@ class WharfImpl : Wharf() {
         providerClass: KClass<out DeckProvider<*>>,
         providerIdentity: Int,
     ) {
-        entryPoints[providerClass.java]?.let { dep ->
-            application?.let { app ->
-                val dependencies = EntryPoints.get(app, dep)
-                val containers = dependencies.containers()
-                deckEntry.addProvider(providerIdentity)
-                containers.forEach {
-                    deckEntry.addContainer(
-                        providerIdentity = providerIdentity,
-                        containerClass = it::class,
-                        container = it,
-                    )
-                }
-                dependencies.containerUiToContainerPairs().forEach { uiContainerPair ->
-                    val containerUi = uiContainerPair.first
-                    deckEntry.addContainerUi(
-                        containerUiClass = containerUi::class,
-                        containerClass = uiContainerPair.second,
-                        containerUi = containerUi,
-                    )
-                    deckEntry.getDeckContainer(containerUi::class)?.let { container ->
-                        setContainerToContainerUi(containerUi, container)
-                    }
+        entryPoints[providerClass.java]?.let { dependencies ->
+            val containers = dependencies.containers()
+            deckEntry.addProvider(providerIdentity)
+            containers.forEach {
+                deckEntry.addContainer(
+                    providerIdentity = providerIdentity,
+                    containerClass = it::class,
+                    container = it,
+                )
+            }
+            dependencies.containerUiToContainerPairs().forEach { uiContainerPair ->
+                val containerUi = uiContainerPair.first
+                deckEntry.addContainerUi(
+                    containerUiClass = containerUi::class,
+                    containerClass = uiContainerPair.second,
+                    containerUi = containerUi,
+                )
+                deckEntry.getDeckContainer(containerUi::class)?.let { container ->
+                    setContainerToContainerUi(containerUi, container)
                 }
             }
         }

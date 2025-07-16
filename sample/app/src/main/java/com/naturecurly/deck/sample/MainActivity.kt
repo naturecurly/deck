@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MainScreen()
+//            SecondaryScreen()
         }
     }
 }

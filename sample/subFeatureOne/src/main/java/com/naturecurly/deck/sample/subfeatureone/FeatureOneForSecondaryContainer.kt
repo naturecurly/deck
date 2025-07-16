@@ -20,24 +20,29 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.compose
+package com.naturecurly.deck.sample.subfeatureone
 
 import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckContainerUi
-import com.naturecurly.deck.DeckProvider
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import kotlin.reflect.KClass
+import com.naturecurly.deck.annotations.Container
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface DeckDependenciesEntryPoint {
-    fun dependencies(): Map<Class<*>, DeckDependencies>
-}
+@Container(bindTo = "SecondaryScreen")
+class FeatureOneForSecondaryContainer @Inject constructor() : DeckContainer<Int, String>() {
+    private val _uiStateFlow = MutableStateFlow<String>("")
+    lateinit var scope: CoroutineScope
+    override fun init(scope: CoroutineScope) {
+        this.scope = scope
+    }
 
-interface DeckDependencies {
-    fun providerClass(): KClass<out DeckProvider<*>>
-    fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>>
-    fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>>
+    override fun onDataReady(scope: CoroutineScope, data: Int) {
+        _uiStateFlow.value = "FeatureOneForSecondary: $data"
+    }
+
+    override val uiStateFlow: StateFlow<String> = _uiStateFlow
+
+    override fun <Event> onEvent(event: Event) {
+    }
 }

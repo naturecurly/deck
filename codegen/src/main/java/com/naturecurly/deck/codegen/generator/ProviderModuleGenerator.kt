@@ -68,8 +68,9 @@ class ProviderModuleGenerator(private val codeGenerator: CodeGenerator) {
             .addAnnotation(IntoMap::class)
             .addAnnotation(Provides::class)
             .addAnnotation(classKeyAnnotation)
-            .returns(deckDepsClassReturnType)
-            .addCode("return %T::class.java", providerDepsInterfaceClassName)
+            .addParameter("dependencies", providerDepsInterfaceClassName)
+            .returns(deckDependenciesClassName)
+            .addCode("return dependencies")
             .build()
 
         val functionProviderKClass = FunSpec.builder("provideDeckProviderKClass")
