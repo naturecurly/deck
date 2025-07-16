@@ -20,24 +20,34 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.compose
+package com.naturecurly.deck.sample.feature1
 
-import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckContainerUi
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.naturecurly.deck.ContainerEvent
 import com.naturecurly.deck.DeckProvider
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import kotlin.reflect.KClass
+import com.naturecurly.deck.WharfAccess
+import com.naturecurly.deck.annotations.Provider
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface DeckDependenciesEntryPoint {
-    fun dependencies(): Map<Class<*>, DeckDependencies>
-}
+@HiltViewModel
+@Provider("SecondaryScreen")
+class SecondaryViewModel @Inject constructor(private val wharfAccess: WharfAccess) :
+    ViewModel(),
+    DeckProvider<Int>,
+    WharfAccess by wharfAccess {
+    init {
+        initDeckProvider(viewModelScope)
+        onDeckReady(viewModelScope, 7)
+    }
 
-interface DeckDependencies {
-    fun providerClass(): KClass<out DeckProvider<*>>
-    fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>>
-    fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>>
+    override fun onContainerEvent(containerEvent: ContainerEvent) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        onDeckClear()
+    }
 }

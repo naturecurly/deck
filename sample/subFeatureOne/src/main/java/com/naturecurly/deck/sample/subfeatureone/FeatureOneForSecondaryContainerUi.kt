@@ -20,24 +20,31 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.compose
+package com.naturecurly.deck.sample.subfeatureone
 
-import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckContainerUi
-import com.naturecurly.deck.DeckProvider
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import kotlin.reflect.KClass
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.naturecurly.deck.annotations.ContainerUi
+import com.naturecurly.deck.compose.DeckComposeContainerUi
+import javax.inject.Inject
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface DeckDependenciesEntryPoint {
-    fun dependencies(): Map<Class<*>, DeckDependencies>
-}
+@ContainerUi(bindTo = "SecondaryScreen")
+class FeatureOneForSecondaryContainerUi @Inject constructor() : DeckComposeContainerUi<String, FeatureOneForSecondaryContainer>() {
+    override val id: String
+        get() = "FeatureOneForSecondary"
 
-interface DeckDependencies {
-    fun providerClass(): KClass<out DeckProvider<*>>
-    fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>>
-    fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>>
+    @Composable
+    override fun Content(modifier: Modifier) {
+        val uiState by container.uiStateFlow.collectAsStateWithLifecycle()
+        Text(
+            text = uiState,
+            modifier = modifier.clickable {
+                container.onEvent(Event.UpdateValueEvent)
+            },
+        )
+    }
 }

@@ -20,24 +20,35 @@
  * SOFTWARE.
  */
 
-package com.naturecurly.deck.compose
+package com.naturecurly.deck.sample.feature1
 
-import com.naturecurly.deck.DeckContainer
-import com.naturecurly.deck.DeckContainerUi
-import com.naturecurly.deck.DeckProvider
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import kotlin.reflect.KClass
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.naturecurly.deck.compose.Deck
+import com.naturecurly.deck.compose.DeckScope
+import com.naturecurly.deck.sample.designsystem.theme.DeckTheme
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface DeckDependenciesEntryPoint {
-    fun dependencies(): Map<Class<*>, DeckDependencies>
+@Composable
+fun SecondaryScreen(viewModel: SecondaryViewModel = viewModel()) {
+    DeckTheme {
+        Deck(viewModel) {
+            Content()
+        }
+    }
 }
 
-interface DeckDependencies {
-    fun providerClass(): KClass<out DeckProvider<*>>
-    fun containers(): Set<@JvmSuppressWildcards DeckContainer<*, *>>
-    fun containerUiToContainerPairs(): Set<@JvmSuppressWildcards Pair<DeckContainerUi<*, *>, KClass<out DeckContainer<*, *>>>>
+@Composable
+private fun DeckScope.Content() {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            Text("Secondary Screen")
+            Stub("FeatureOneForSecondary")
+        }
+    }
 }

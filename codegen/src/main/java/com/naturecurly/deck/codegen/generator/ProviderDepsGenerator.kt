@@ -34,24 +34,27 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.writeTo
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import jakarta.inject.Inject
 import java.util.Locale
 import kotlin.reflect.KClass
 
 class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
-    fun generate(originatingFile: KSFile, providerId: String, destinationPackageName: String): ClassName {
+    fun generate(
+        originatingFile: KSFile,
+        providerId: String,
+        destinationPackageName: String,
+    ): ClassName {
         val deckDependenciesInterfaceName =
             providerId.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() } + "DeckDependencies"
-        val deckQualifierAnnotation = getDeckQualifierAnnotation(providerId)
 
         // region Return Type
         val containerSetReturnType = Set::class.asClassName().parameterizedBy(
@@ -76,39 +79,41 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
         // endregion
 
         // region Functions
-        val functionProviderClass = FunSpec.builder("providerClass")
+        val providerClassPropertyName = "providerClass"
+        val functionProviderClass = FunSpec.builder(providerClassPropertyName)
             .addOriginatingKSFile(originatingFile)
-            .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
-            .addModifiers(KModifier.ABSTRACT)
             .returns(deckProviderKClassReturnType)
+            .addStatement("return $providerClassPropertyName")
             .build()
 
-        val functionContainer = FunSpec.builder("containers")
+        val containerPropertyName = "containers"
+        val functionContainer = FunSpec.builder(containerPropertyName)
             .addOriginatingKSFile(originatingFile)
-            .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
-            .addModifiers(KModifier.ABSTRACT)
             .returns(containerSetReturnType)
+            .addStatement("return $containerPropertyName")
             .build()
 
+        val containerUiPairPropertyName = "containerUiToContainerPairs"
         val functionContainerUiToContainerPairs = FunSpec.builder("containerUiToContainerPairs")
             .addOriginatingKSFile(originatingFile)
-            .addAnnotation(deckQualifierAnnotation)
             .addModifiers(KModifier.OVERRIDE)
-            .addModifiers(KModifier.ABSTRACT)
             .returns(containerUiToContainerPairsReturnType)
+            .addStatement("return $containerUiPairPropertyName")
             .build()
         // endregion
 
         val deckDependenciesInterfaceType =
-            TypeSpec.interfaceBuilder(deckDependenciesInterfaceName)
+            TypeSpec.classBuilder(deckDependenciesInterfaceName)
                 .addOriginatingKSFile(originatingFile)
-                .addAnnotation(EntryPoint::class)
-                .addAnnotation(
-                    AnnotationSpec.builder(InstallIn::class)
-                        .addMember("%T::class", SingletonComponent::class)
-                        .build(),
+                .constructor(
+                    providerId,
+                    mapOf(
+                        providerClassPropertyName to deckProviderKClassReturnType,
+                        containerPropertyName to containerSetReturnType,
+                        containerUiPairPropertyName to containerUiToContainerPairsReturnType,
+                    ),
                 )
                 .addSuperinterface(deckDependenciesClassName)
                 .addFunction(functionProviderClass)
@@ -123,5 +128,31 @@ class ProviderDepsGenerator(private val codeGenerator: CodeGenerator) {
             .build()
             .writeTo(codeGenerator, aggregating = false)
         return deckDependenciesInterfaceClassName
+    }
+
+    private fun TypeSpec.Builder.constructor(
+        providerId: String,
+        properties: Map<String, ParameterizedTypeName>,
+    ): TypeSpec.Builder {
+        val deckQualifierAnnotation = getDeckQualifierAnnotation(providerId)
+
+        return this.primaryConstructor(
+            FunSpec.constructorBuilder()
+                .addAnnotation(Inject::class.asClassName())
+                .apply {
+                    properties.forEach { name, type ->
+                        addParameter(name, type)
+                    }
+                }
+                .build(),
+        ).addProperties(
+            properties.map {
+                PropertySpec.builder(it.key, it.value)
+                    .initializer(it.key)
+                    .addAnnotation(deckQualifierAnnotation)
+                    .addModifiers(KModifier.PRIVATE)
+                    .build()
+            },
+        )
     }
 }
