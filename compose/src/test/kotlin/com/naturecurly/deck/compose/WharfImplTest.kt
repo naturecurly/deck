@@ -57,7 +57,7 @@ class WharfImplTest {
         // Given
         val mockedContext: Application = mockk(relaxed = true)
         val entryPoints: DeckDependenciesEntryPoint = object : DeckDependenciesEntryPoint {
-            override fun dependencies(): Map<Class<*>, @JvmSuppressWildcards Class<out DeckDependencies>> {
+            override fun dependencies(): Map<Class<*>, DeckDependencies> {
                 return mapOf()
             }
         }
@@ -100,8 +100,8 @@ class WharfImplTest {
         val mockedContext: Application = mockk(relaxed = true)
 
         val entryPoints: DeckDependenciesEntryPoint = object : DeckDependenciesEntryPoint {
-            override fun dependencies(): Map<Class<*>, @JvmSuppressWildcards Class<out DeckDependencies>> {
-                return mapOf(DeckProviderTest::class.java to DeckDependenciesTest::class.java)
+            override fun dependencies(): Map<Class<*>, DeckDependencies> {
+                return mapOf(DeckProviderTest::class.java to DeckDependenciesTest())
             }
         }
         mockkStatic(EntryPoints::class)
