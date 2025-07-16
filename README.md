@@ -60,7 +60,7 @@ Usage
 ### Primary Feature
 1. Make the ViewModel or Presenter of the primary feature inherit from DeckProvider. Specify the generic type for the type that the subfeatures will consume. For example, the `MainViewModel` below exposes a `String` to subfeatures:
 ```kotlin
-class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> { // Extends the DeckProvider
+class MainViewModel @Inject constructor(wharfAccess: WharfAccess) : ViewModel(), DeckProvider<String>, WharfAccess by wharfAccess { // Extends the DeckProvider
     // ViewModel logic here
 }
 ```
@@ -74,7 +74,7 @@ class MainViewModel @Inject constructor(wharfAccess: WharfAccess) : ViewModel(),
 3. Call DeckProvider's lifecycle functions at the appropriate time
 ```kotlin
 @Provider("MainFeature")
-class MainViewModel @Inject constructor() : ViewModel(), DeckProvider<String> {
+class MainViewModel @Inject constructor(wharfAccess: WharfAccess) : ViewModel(), DeckProvider<String>, WharfAccess by wharfAccess {
     init {
         initDeckProvider(viewModelScope) // Call DeckProvider's init function
         onDeckReady(viewModelScope, "Hello, World!") // Call when the output data is ready
