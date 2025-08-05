@@ -31,6 +31,7 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.intellij.psi.PsiClass
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
@@ -62,7 +63,8 @@ class ProviderDetector :
     override fun createUastHandler(context: JavaContext): UElementHandler {
         return object : UElementHandler() {
             override fun visitClass(node: UClass) {
-                if (!implementsTargetInterface(node)) {
+                val psiClass = node.javaPsi as? PsiClass ?: return
+                if (!context.evaluator.implementsInterface(psiClass, INTERFACE_QUALIFIED_NAME, true)) {
                     return
                 }
 
@@ -77,10 +79,6 @@ class ProviderDetector :
                 }
             }
         }
-    }
-
-    private fun implementsTargetInterface(clazz: UClass): Boolean {
-        return clazz.interfaces.any { it.qualifiedName == INTERFACE_QUALIFIED_NAME }
     }
 
     private fun checkForClearMethodCall(clazz: UClass): Boolean {
