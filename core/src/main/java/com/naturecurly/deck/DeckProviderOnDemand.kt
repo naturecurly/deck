@@ -22,29 +22,37 @@
 
 package com.naturecurly.deck
 
-import kotlin.reflect.KClass
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
 
-class WharfAccessImpl(private val wharf: Wharf) : WharfAccess {
-    override fun <INPUT> getDeckContainers(providerIdentity: Int): Set<DeckContainer<INPUT, *>> {
-        return wharf.getDeckContainers<INPUT>(providerIdentity)
+interface DeckProviderOnDemand<OUTPUT> : DeckProvider<OUTPUT> {
+    private val containers: Map<String, DeckContainer<OUTPUT, *>>
+        get() = getDeckContainersMap(System.identityHashCode(this))
+
+    fun containerIdsAvailable(): List<String>
+
+    override fun initDeckProvider(scope: CoroutineScope) {
+        registerNewProvider<OUTPUT>(this::class, System.identityHashCode(this))
     }
 
-    override fun getDeckContainerUis(providerIdentity: Int): Map<String, DeckContainerUi<*, *>> {
-        return wharf.getDeckContainerUis(providerIdentity)
+    fun initContainers(scope: CoroutineScope) {
+        val availableContainers = containerIdsAvailable().mapNotNull { containers[it] }.toSet()
+        availableContainers.forEach {
+            it.init(scope)
+        }
+        val containersFlow =
+            merge(*(availableContainers.map { it.containerEventFlow }.toTypedArray()))
+        scope.launch {
+            containersFlow.collect {
+                onContainerEvent(it)
+            }
+        }
     }
 
-    override fun <INPUT> getDeckContainersMap(providerIdentity: Int): Map<String, DeckContainer<INPUT, *>> {
-        return wharf.getDeckContainersMap(providerIdentity)
-    }
-
-    override fun clearProvider(providerIdentity: Int) {
-        return wharf.clearProvider(providerIdentity)
-    }
-
-    override fun <INPUT> registerNewProvider(
-        providerClass: KClass<out DeckProvider<*>>,
-        providerIdentity: Int,
-    ) {
-        wharf.registerNewProvider(providerClass, providerIdentity)
+    override fun onDeckReady(scope: CoroutineScope, data: OUTPUT) {
+        containerIdsAvailable().mapNotNull { containers[it] }.toSet().forEach {
+            it.onDataReady(scope, data)
+        }
     }
 }

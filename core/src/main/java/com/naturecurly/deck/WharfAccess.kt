@@ -31,6 +31,8 @@ interface WharfAccess {
     )
 
     fun <INPUT> getDeckContainers(providerIdentity: Int): Set<DeckContainer<INPUT, *>>
+
+    fun <INPUT> getDeckContainersMap(providerIdentity: Int): Map<String, DeckContainer<INPUT, *>>
     fun getDeckContainerUis(providerIdentity: Int): Map<String, DeckContainerUi<*, *>>
     fun clearProvider(providerIdentity: Int)
 }

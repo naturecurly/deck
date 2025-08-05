@@ -25,25 +25,56 @@ package com.naturecurly.deck.sample.feature1
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naturecurly.deck.ContainerEvent
-import com.naturecurly.deck.DeckProvider
+import com.naturecurly.deck.DeckProviderOnDemand
 import com.naturecurly.deck.WharfAccess
 import com.naturecurly.deck.annotations.Provider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 @Provider("SecondaryScreen")
 class SecondaryViewModel @Inject constructor(private val wharfAccess: WharfAccess) :
     ViewModel(),
-    DeckProvider<Int>,
+    DeckProviderOnDemand<Int>,
     WharfAccess by wharfAccess {
+
+    private val _availableContainerIdsFlow = MutableStateFlow(emptyList<String>())
+
+    val availableContainerIdsFlow: StateFlow<List<String>> = _availableContainerIdsFlow
+
     init {
         initDeckProvider(viewModelScope)
-        onDeckReady(viewModelScope, 7)
+        initContainersOnDemand()
     }
+
+    fun initContainersOnDemand() {
+        viewModelScope.launch {
+            delay(2000)
+            _availableContainerIdsFlow.value = listOf("FeatureOneForSecondary")
+            initContainers(viewModelScope)
+            onDeckReady(viewModelScope, LocalDateTime.now().second)
+        }
+    }
+
+    override fun containerIdsAvailable(): List<String> = availableContainerIdsFlow.value
 
     override fun onContainerEvent(containerEvent: ContainerEvent) {
         TODO("Not yet implemented")
+    }
+
+    fun showOrHideContainer() {
+        _availableContainerIdsFlow.value = if (availableContainerIdsFlow.value.isNotEmpty()) {
+            emptyList()
+        } else {
+            listOf("FeatureOneForSecondary")
+        }
+        initContainers(viewModelScope)
+        onDeckReady(viewModelScope, LocalDateTime.now().second)
     }
 
     override fun onCleared() {

@@ -197,4 +197,54 @@ class DeckEntryTest {
         assertThat(deckEntry.getDeckContainers(123)).isEmpty()
         assertThat(deckEntry.getContainerUisByProvider(123, false)).isEmpty()
     }
+
+    @Test
+    fun `verify getContainersMapByProvider`() {
+        // Given
+        val deckEntry = DeckEntry()
+        val containerClass: KClass<out DeckContainer<*, *>> = mockk()
+        val container: DeckContainer<*, *> = mockk()
+        val containerUiClass: KClass<out DeckContainerUi<*, *>> = mockk()
+        val containerUi: DeckContainerUi<*, *> = mockk()
+
+        // When
+        val resultWhenProviderNotExists = deckEntry.getContainersMapByProvider<Any>(
+            providerIdentity = 123,
+            filterDisabled = false,
+        )
+        // Then
+        assertThat(resultWhenProviderNotExists).isEmpty()
+
+        // When
+        every { containerUi.id } returns "456"
+        every { container.isEnabled } returns true
+        deckEntry.addProvider(123)
+        deckEntry.addContainer(123, containerClass, container)
+        deckEntry.addContainerUi(containerUiClass, containerClass, containerUi)
+        val resultWhenEnabled = deckEntry.getContainersMapByProvider<Any>(
+            providerIdentity = 123,
+            filterDisabled = false,
+        )
+        // Then
+        assertThat(resultWhenEnabled).hasSize(1)
+        assertThat(resultWhenEnabled["456"]).isEqualTo(container)
+
+        // When
+        every { container.isEnabled } returns false
+        val resultWhenDisabled = deckEntry.getContainersMapByProvider<Any>(
+            providerIdentity = 123,
+            filterDisabled = true,
+        )
+        // Then
+        assertThat(resultWhenDisabled).isEmpty()
+
+        // When
+        every { container.isEnabled } returns true
+        val resultOfAnotherProvider = deckEntry.getContainersMapByProvider<Any>(
+            providerIdentity = 1234,
+            filterDisabled = false,
+        )
+        // Then
+        assertThat(resultOfAnotherProvider).isEmpty()
+    }
 }

@@ -25,10 +25,13 @@ package com.naturecurly.deck.sample.feature1
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.naturecurly.deck.compose.Deck
 import com.naturecurly.deck.compose.DeckScope
@@ -38,17 +41,23 @@ import com.naturecurly.deck.sample.designsystem.theme.DeckTheme
 fun SecondaryScreen(viewModel: SecondaryViewModel = viewModel()) {
     DeckTheme {
         Deck(viewModel) {
-            Content()
+            val ids by viewModel.availableContainerIdsFlow.collectAsStateWithLifecycle()
+            Content(ids, viewModel::showOrHideContainer)
         }
     }
 }
 
 @Composable
-private fun DeckScope.Content() {
+private fun DeckScope.Content(availableContainerIds: List<String>, onClick: () -> Unit) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             Text("Secondary Screen")
-            Stub("FeatureOneForSecondary")
+            availableContainerIds.forEach {
+                Stub(it)
+            }
+            Button(onClick = onClick) {
+                Text("Show/Hide the container")
+            }
         }
     }
 }

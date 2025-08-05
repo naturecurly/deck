@@ -102,4 +102,22 @@ class DeckEntry {
             ?.map { it.containerUi }
             ?.toSet() ?: emptySet()
     }
+
+    internal fun <INPUT> getContainersMapByProvider(
+        providerIdentity: Int,
+        filterDisabled: Boolean,
+    ): Map<String, DeckContainer<INPUT, *>> {
+        return providers[providerIdentity]?.containers
+            ?.run {
+                if (filterDisabled) {
+                    filter { it.container.isEnabled }
+                } else {
+                    this
+                }
+            }
+            ?.flatMap { it.containerUis }
+            ?.associate {
+                it.containerUi.id to it.container.container as DeckContainer<INPUT, *>
+            } ?: emptyMap()
+    }
 }

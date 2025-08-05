@@ -44,6 +44,13 @@ abstract class Wharf {
             .associate { it.id to it }
     }
 
+    internal fun <INPUT> getDeckContainersMap(
+        providerIdentity: Int,
+        filterDisabled: Boolean = true,
+    ): Map<String, DeckContainer<INPUT, *>> {
+        return deckEntry.getContainersMapByProvider(providerIdentity, filterDisabled)
+    }
+
     protected fun setContainerToContainerUi(
         containerUi: DeckContainerUi<*, *>,
         container: DeckContainer<*, *>,
