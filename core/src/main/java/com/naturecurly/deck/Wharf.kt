@@ -58,7 +58,7 @@ abstract class Wharf {
         containerUi.setContainer(container)
     }
 
-    internal fun clearProvider(providerIdentity: Int) {
+    open fun clearProvider(providerIdentity: Int) {
         deckEntry.clearProvider(providerIdentity)
     }
 

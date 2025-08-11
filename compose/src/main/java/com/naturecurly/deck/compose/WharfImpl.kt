@@ -25,24 +25,16 @@ package com.naturecurly.deck.compose
 import android.app.Application
 import com.naturecurly.deck.DeckProvider
 import com.naturecurly.deck.Wharf
-import com.naturecurly.deck.compose.log.DeckLog
 import dagger.hilt.EntryPoints
 import kotlin.reflect.KClass
 
 class WharfImpl : Wharf() {
-    private val entryPoints: MutableMap<Class<*>, DeckDependencies> = mutableMapOf()
-
+    internal val entryPoints: MutableMap<Int, DeckDependencies> = mutableMapOf()
+    private var app: Application? = null
     internal fun init(app: Application) {
+        this.app = app
         entryPoints.clear()
         deckEntry.clear()
-        runCatching {
-            entryPoints.putAll(
-                EntryPoints.get(app, DeckDependenciesEntryPoint::class.java).dependencies(),
-            )
-        }.onFailure {
-            DeckLog.e("WharfImpl initialization failed", it)
-            return
-        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -50,7 +42,14 @@ class WharfImpl : Wharf() {
         providerClass: KClass<out DeckProvider<*>>,
         providerIdentity: Int,
     ) {
-        entryPoints[providerClass.java]?.let { dependencies ->
+        app?.let { app ->
+            EntryPoints.get(app, DeckDependenciesEntryPoint::class.java).dependencies()
+                .get(providerClass.java)?.let {
+                    entryPoints[providerIdentity] = it
+                }
+        }
+
+        entryPoints[providerIdentity]?.let { dependencies ->
             val containers = dependencies.containers()
             deckEntry.addProvider(providerIdentity)
             containers.forEach {
@@ -72,5 +71,10 @@ class WharfImpl : Wharf() {
                 }
             }
         }
+    }
+
+    override fun clearProvider(providerIdentity: Int) {
+        super.clearProvider(providerIdentity)
+        entryPoints.remove(providerIdentity)
     }
 }

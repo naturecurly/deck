@@ -24,6 +24,7 @@ package com.naturecurly.deck.compose
 
 import android.app.Application
 import android.util.Log
+import com.google.common.truth.Truth.assertThat
 import com.naturecurly.deck.ContainerEvent
 import com.naturecurly.deck.DeckContainer
 import com.naturecurly.deck.DeckContainerUi
@@ -77,24 +78,6 @@ class WharfImplTest {
     }
 
     @Test
-    fun `verify WharfImpl entryPoints init failed`() {
-        // Given
-        val mockedContext: Application = mockk(relaxed = true)
-        mockkStatic(EntryPoints::class)
-        every {
-            EntryPoints.get(
-                mockedContext,
-                DeckDependenciesEntryPoint::class.java,
-            )
-        } throws RuntimeException()
-        // When
-        val wharf = WharfImpl()
-        wharf.init(mockedContext)
-        // Then
-        verify { DeckLog.e(any(), any()) }
-    }
-
-    @Test
     fun `verify WharfImpl registerNewProvider`() {
         // Given
         val mockedContext: Application = mockk(relaxed = true)
@@ -124,6 +107,11 @@ class WharfImplTest {
         // Then
         verify(exactly = 0) { DeckLog.e(any(), any()) }
         verify(exactly = 0) { DeckLog.w(any()) }
+        assertThat(wharf.entryPoints[123]).isNotNull()
+        // When
+        wharf.clearProvider(123)
+        // Then
+        assertThat(wharf.entryPoints).isEmpty()
     }
 
     @Test
